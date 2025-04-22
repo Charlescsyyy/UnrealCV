@@ -1023,7 +1023,7 @@ class UnrealCv_API(object):
         Example:
             >>> api.set_new_obj('Cube_C', 'cube_1')
         """
-        cmd = f'vset /object/spawn {class_name} {obj_name}'
+        cmd = f'vset /objects/spawn {class_name} {obj_name}'
         res = self.client.request(cmd)
         if self.checker.is_error(res):
 
