@@ -21,3 +21,9 @@ dependencies = [
     "black",
     "flake8"
 ]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
