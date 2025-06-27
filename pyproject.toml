@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lychsim"
+version = "0.1.0"
+description = "LychSim"
+readme = "README.md"
+requires-python = ">=3.8"
+authors = [
+    { name = "Wufei Ma", email = "wufeim@gmail.com" },
+    { name = "Siyi Chen", email = "" },
+]
+classifiers=[
+    "Natural Language :: English",
+    "License :: Other/Proprietary License",
+    "Programming Language :: Python :: 3"
+dependencies = [
+    "numpy",
+    "black",
+    "flake8"
+]
