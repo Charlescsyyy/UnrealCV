@@ -14,6 +14,8 @@ from lychsim.core import OBB, Object
 from lychsim.core import SemanticScene, SemanticLevel, SemanticRegion
 from lychsim.utils import ModelOutput
 
+__all__ = ['load_infinigen_frame', 'InfinigenFrameOutput']
+
 
 @dataclass
 class InfinigenFrameOutput(ModelOutput):
