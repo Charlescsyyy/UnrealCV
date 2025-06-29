@@ -1,5 +1,13 @@
 <div align="center">
-  <h1><a href="https://emoji.gg/emoji/4976-lychee-fruit"><img src="https://cdn3.emoji.gg/emojis/4976-lychee-fruit.png" width="28px" height="28px" alt="lychee_fruit"></a>LychSim</h1>
+  <h1><img src="https://cdn3.emoji.gg/emojis/4976-lychee-fruit.png" width="28px" height="28px" alt="lychee_fruit">LychSim</h1>
+</div>
+<div align="center">
+  <a href="https://https://lychsim.github.io/">
+    <img alt="webpage" src="https://img.shields.io/badge/LychSim-Project%20Page-blue">
+  </a>
+  <a href="https://wufeim.github.io/LychSim/">
+    <img alt="documentation" src="https://img.shields.io/badge/LychSim-Documentation-CC3333">
+  </a>
 </div>
 
 ## Roadmap
