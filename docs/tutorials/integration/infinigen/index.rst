@@ -61,6 +61,8 @@ Prepare a canvas for visualization.
 
 .. code-block:: python
 
+    from lychsim.utils import rgbd2rgb
+
     orig_image = rgbd2rgb(infinigen_frame.image)
     plot_image = orig_image.copy()
 
@@ -78,4 +80,4 @@ Visualize object OBBs.
 .. image:: figures/bbox3d_cam0_frame48.png
    :align: center
 
-See full script in `example_scripts/infinigen/visualize_infinigen_bbox3d.py <https://github.com/wufeim/LychSim/blob/main/examples_scripts/visualize_infinigen_bbox3d.py>`_.
+See full script in `example_scripts/infinigen/visualize_infinigen_bbox3d.py <https://github.com/wufeim/LychSim/blob/main/example_scripts/infinigen/visualize_infinigen_bbox3d.py>`_.
