@@ -20,7 +20,7 @@ Please follow the instructions in :code:`Infinigen` to generate synthetic indoor
 Loading an Infinigen Scene
 --------------------------
 
-An :code:`Infinigen` can be loaded into :code:`LychSim`-compatible format using :code:`lychsim.tools.infinigen.load_infinigen_scene` for scene data and :code:`lychsim.tools.infinigen.load_infinigen_frame` for both scene and frame data. For example,
+An :code:`Infinigen` scene can be loaded into :code:`LychSim`-compatible format using :code:`lychsim.tools.infinigen.load_infinigen_scene` for scene data and :code:`lychsim.tools.infinigen.load_infinigen_frame` for both scene and frame data. For example,
 
 .. code-block:: python
 
