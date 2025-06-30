@@ -1,5 +1,6 @@
 from shapely import Polygon
 
+from lychsim.core.bbox import OBB
 from lychsim.core.object import Object
 
 __all__ = ['SemanticScene', 'SemanticLevel', 'SemanticRegion']
@@ -11,12 +12,14 @@ class SemanticRegion:
     """
 
     def __init__(
-        self, name: str, objects: list[Object] = None,
-        polygon: Polygon = None
+        self, name: str, uid: str = None, objects: list[Object] = None,
+        polygon: Polygon = None, obb: OBB = None
     ):
         self.name = name
+        self.uid = uid
         self.objects = objects if objects is not None else []
         self.polygon = polygon
+        self.obb = obb
 
     def get_all_objects(self):
         """Returns the list of objects in the region.
@@ -36,8 +39,11 @@ class SemanticLevel:
     regions and objects.
     """
 
-    def __init__(self, name: str, regions: list[SemanticRegion] = None):
+    def __init__(
+        self, name: str, uid: str = None, regions: list[SemanticRegion] = None
+    ):
         self.name = name
+        self.uid = uid
         self.regions = regions if regions is not None else []
 
     def get_all_objects(self):
@@ -63,8 +69,11 @@ class SemanticScene:
     regions, and objects.
     """
 
-    def __init__(self, name: str, levels: list[SemanticLevel] = None):
+    def __init__(
+        self, name: str, uid: str = None, levels: list[SemanticLevel] = None
+    ):
         self.name = name
+        self.uid = uid
         self.levels = levels if levels is not None else []
 
     def get_all_objects(self):
