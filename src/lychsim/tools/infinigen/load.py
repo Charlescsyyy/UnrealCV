@@ -82,9 +82,6 @@ def load_floor(mesh_path: str, mesh: Dict[str, Any]):
     mesh_vertices = data[f'{mesh_id}_vertices']
     mesh_loop_totals = data[f'{mesh_id}_loop_totals']
 
-    if mesh_id == '0x7680783f':
-        print(mesh_vertices)
-
     mesh_vertices = mesh_vertices[:, :2]
 
     offset, edges = 0, []
@@ -127,7 +124,8 @@ def create_scene(
     for room_name in semantic_rooms:
         region = SemanticRegion(
             name=room_name,
-            polygon=room_meshes[room_name+'.floor'])
+            polygon=room_meshes[room_name+'.floor'],
+            obb=objects[room_name+'.floor'].obb)
         for obj_name in room_child_mapping[room_name]:
             region.objects.append(objects[obj_name])
         level_name = f'level_{room_level(room_name)}'
@@ -212,7 +210,6 @@ def load_infinigen_frame(
         for mesh in mesh_metadata:
             if 'floor' in mesh['object_name']:
                 room_meshes[mesh['object_name']] = load_floor(mesh_path, mesh)
-        print(room_meshes.keys())
 
         # 3. Create scene from scene-level data
         solve_state_path = os.path.join(
