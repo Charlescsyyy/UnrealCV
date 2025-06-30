@@ -1,3 +1,5 @@
+from .bbox import OBB
+
 __all__ = ['Object']
 
 
@@ -5,7 +7,7 @@ class Object:
     """LychSim Object.
     """
     def __init__(
-        self, name=None, uid=None, obb=None
+        self, name: str = None, uid: str = None, obb: OBB = None
     ):
         self.name = name
         self.uid = uid
