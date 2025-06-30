@@ -10,7 +10,8 @@ from lychsim.tools.infinigen import load_infinigen_frame
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='Visualize Infinigen SemanticRegion.')
+    parser = argparse.ArgumentParser(
+        description='Visualize Infinigen SemanticRegion.')
     parser.add_argument('--scene_path', type=str,
                         default='/path/to/infinigen/scene')
     parser.add_argument('--output_folder', type=str, default='lychsim')
@@ -35,7 +36,6 @@ def main():
         print(f'Visualizing {region.name}...')
 
         fig, ax = plt.subplots(figsize=(8, 8))
-        colors = ['#AED6F1', '#A9DFBF', '#F9E79F']
 
         # Draw room floor
         floor_coords = np.array(region.polygon.exterior.coords[:])
@@ -45,7 +45,7 @@ def main():
             region.obb.rotation @ floor_coords.T
         ).T + region.obb.translation
         ax.add_patch(Polygon(
-            floor_coords[:, :2], facecolor=colors[0],
+            floor_coords[:, :2], facecolor='#AED6F1',
             edgecolor='black', alpha=0.5, linewidth=2))
 
         xmin, xmax = floor_coords[:, 0].min()-0.5, floor_coords[:, 0].max()
@@ -61,10 +61,9 @@ def main():
                 corners[:, :2].tolist(),
                 np.mean(corners[:, :2], axis=0),
                 float(corners[0, 2])))
-
-        object_colors = COLORMAPS_HEX['sns_set2'][1:]
-
         plot_objects.sort(key=lambda x: x[3])
+
+        object_colors = COLORMAPS_HEX['sns_set2']
         for idx, obj in enumerate(plot_objects):
             ax.add_patch(Polygon(
                 obj[1], facecolor=object_colors[idx % len(object_colors)]))
