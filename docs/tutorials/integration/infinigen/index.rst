@@ -81,3 +81,67 @@ Visualize object OBBs.
    :align: center
 
 See full script in `example_scripts/infinigen/visualize_infinigen_bbox3d.py <https://github.com/wufeim/LychSim/blob/main/example_scripts/infinigen/visualize_infinigen_bbox3d.py>`_.
+
+Visualizing a Scene Layout
+--------------------------
+
+In this section, we show how to visualize a bird's eye view layout of an :code:`Infinigen` scene.
+
+We start by creating an empty canvas.
+
+.. code-block:: python
+
+    import matplotlib.pyplot as plt
+
+    fig, ax = plt.subplots(figsize=(8, 8))
+
+We first visualize the floor of the room.
+
+.. code-block:: python
+
+    from matplotlib.patches import Polygon
+
+    floor_coords = np.array(region.polygon.exterior.coords[:])
+    floor_coords = np.concatenate([
+        floor_coords, np.zeros((floor_coords.shape[0], 1))], axis=1)
+    floor_coords = (
+        region.obb.rotation @ floor_coords.T
+    ).T + region.obb.translation
+    ax.add_patch(Polygon(
+        floor_coords[:, :2], facecolor='#AED6F1',
+        edgecolor='black', alpha=0.5, linewidth=2))
+
+Then we sort the objects in the room so we visualize them from lower to higher.
+
+.. code-block:: python
+
+    plot_objects = []
+    for obj in region.objects:
+        corners = obj.obb.corners[:4]
+        plot_objects.append((
+            obj.name.split('Factory')[0],
+            corners[:, :2].tolist(),
+            np.mean(corners[:, :2], axis=0),
+            float(corners[0, 2])))
+    plot_objects.sort(key=lambda x: x[3])
+
+Lastly we draw 2D-view of objects' oriented bounding boxes (OBB) on the canvas.
+
+.. code-block:: python
+
+    for idx, obj in enumerate(plot_objects):
+        ax.add_patch(Polygon(
+            obj[1], facecolor=object_colors[idx % len(object_colors)]))
+    for idx, obj in enumerate(plot_objects):
+        ax.add_patch(Polygon(
+            obj[1], facecolor='none', edgecolor='black'))
+    for idx, obj in enumerate(plot_objects):
+        x, y = obj[2]
+        ax.text(
+            x, y, obj[0], ha='center', va='center',
+            fontsize=10, weight='bold')
+
+.. image:: figures/region_bedroom_0_0.png
+   :align: center
+
+See full script in `example_scripts/infinigen/visualize_infinigen_regions.py <https://github.com/wufeim/LychSim/blob/main/example_scripts/infinigen/visualize_infinigen_regions.py>`_.
