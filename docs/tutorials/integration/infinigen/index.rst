@@ -84,6 +84,8 @@ Example output:
                             Object(name=FloorLampFactory(7020734).spawn_asset(2459297), uid=1_0_0_0)
     (omitted)
 
+See full script in `example_scripts/infinigen/load_and_save_scene.py <https://github.com/wufeim/LychSim/blob/main/example_scripts/infinigen/load_and_save_scene.py>`_.
+
 Visualizing an Infinigen Frame
 ------------------------------
 
