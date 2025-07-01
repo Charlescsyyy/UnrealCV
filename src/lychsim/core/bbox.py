@@ -1,3 +1,5 @@
+from typing import Any, Dict
+
 import numpy as np
 
 from lychsim.utils import FACES
@@ -56,6 +58,20 @@ class AABB:
             extent=self.extent.tolist(),
             translation=self.translation.tolist())
 
+    @classmethod
+    def from_dict(cls, data_dict: Dict[str, Any]):
+        return cls(
+            center=np.array(data_dict['center']),
+            extent=np.array(data_dict['extent']),
+            translation=np.array(data_dict['translation']))
+
+    def __eq__(self, other):
+        if not isinstance(other, AABB):
+            return False
+        return (np.array_equal(self.center, other.center) and
+                np.array_equal(self.extent, other.extent) and
+                np.array_equal(self.translation, other.translation))
+
 
 class OBB:
     """LychSim Oriented Bounding Box (OBB).
@@ -92,5 +108,21 @@ class OBB:
         return dict(
             center=self.center.tolist(),
             extent=self.extent.tolist(),
-            min_point=self.min_point.tolist(),
-            max_point=self.max_point.tolist())
+            rotation=self.rotation.tolist(),
+            translation=self.translation.tolist())
+
+    @classmethod
+    def from_dict(cls, data_dict: Dict[str, Any]):
+        return cls(
+            center=np.array(data_dict['center']),
+            extent=np.array(data_dict['extent']),
+            rotation=np.array(data_dict['rotation']),
+            translation=np.array(data_dict['translation']))
+
+    def __eq__(self, other):
+        if not isinstance(other, OBB):
+            return False
+        return (np.array_equal(self.center, other.center) and
+                np.array_equal(self.extent, other.extent) and
+                np.array_equal(self.rotation, other.rotation) and
+                np.array_equal(self.translation, other.translation))
