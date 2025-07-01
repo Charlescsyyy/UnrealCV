@@ -43,6 +43,47 @@ An :code:`Infinigen` scene can be loaded into :code:`LychSim`-compatible format 
 
 The :code:`frame_index` parameter can be skipped so the script will automatically load the first available frame.
 
+SemanticScene I/O
+-----------------
+
+After loading scenes into :code:`lychsim.core.SemanticScene`, they can be saved and loaded as NumPy archive file easily.
+
+.. code-block:: python
+
+    np.savez(save_path, data=infinigen_frame.scene.to_dict())
+
+    scene_loaded = SemanticScene.from_npz(save_path)
+
+    assert infinigen_frame.scene == scene_loaded, \
+        "Loaded scene does not match the original scene."
+
+Scenes can also be printed and checked for correctness.
+
+.. code-block:: python
+
+    print(infinigen_frame.scene)
+
+Example output:
+
+.. code-block::
+
+    SemanticScene(
+        name=default_scene,
+        uid=None,
+        levels=[
+            SemanticLevel(
+                name=level_0,
+                uid=None,
+                regions=[
+                    SemanticRegion(
+                        name=bedroom_0/0,
+                        uid=None,
+                        polygon=...,
+                        obb=...,
+                        objects=[
+                            Object(name=FloorLampFactory(7020734).spawn_asset(2459297), uid=1_0_0_0)
+    (omitted)
+
 Visualizing an Infinigen Frame
 ------------------------------
 
