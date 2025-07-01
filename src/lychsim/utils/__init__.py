@@ -2,6 +2,7 @@ import numpy as np
 
 from .colors import *
 from .general import rgbd2rgb
+from .io import *
 from .model_output import *
 
 
