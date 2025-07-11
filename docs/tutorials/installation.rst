@@ -42,12 +42,18 @@ Install and Compile LychSim Plugin
    - Open the generated `.sln` file in Visual Studio.
    - Click on "Build" in the top menu, then select "Build Solution".
 
+   .. figure:: figures/installation_04.png
+      :align: center
+
 5. **Enable the LychSim plugin in Unreal Engine.**
 
    - Open your Unreal Engine project.
    - Go to "Edit" > "Plugins".
    - Find the LychSim plugin in the list and enable it.
    - Restart Unreal Engine if prompted.
+
+   .. figure:: figures/installation_03.png
+      :align: center
 
 6. **Verify the installation.**
 
