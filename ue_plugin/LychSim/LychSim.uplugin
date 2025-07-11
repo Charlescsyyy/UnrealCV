@@ -1,0 +1,27 @@
+{
+    "FileVersion": 3,
+    "Version": 1,
+    "VersionName": "0.1.0",
+    "EngineAssociation": "5.5",
+    "FriendlyName": "LychSim",
+    "Description": "LychSim.",
+    "Category": "Science",
+    "Icon": "Resources/Icon128.png",
+    "CreatedBy": "Test Everything Team at CCVL, JHU",
+    "CreatedByURL": "https://ccvl.jhu.edu/",
+    "DocsURL": "https://wufeim.github.io/LychSim/",
+    "MarketplaceURL": "",
+    "SupportURL": "",
+    "EnabledByDefault": true,
+    "CanContainContent": true,
+    "IsBetaVersion": true,
+    "Installed": true,
+    "Modules":
+    [
+        {
+            "Name": "LychSim",
+            "Type" : "Runtime",
+            "LoadingPhase" : "Default"
+        }
+    ]
+}
