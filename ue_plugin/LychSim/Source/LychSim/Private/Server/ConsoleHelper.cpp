@@ -68,6 +68,11 @@ FConsoleHelper::FConsoleHelper()
 		TEXT("LychSim entry point"),
 		FConsoleCommandWithArgsDelegate::CreateRaw(this, &FConsoleHelper::Lych)
 	);
+	IConsoleObject* LychObjectCmd = IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("lych object"),
+		TEXT("LychSim API for object operations"),
+		FConsoleCommandWithArgsDelegate::CreateRaw(this, &FConsoleHelper::Lych)
+	);
 }
 
 FConsoleHelper& FConsoleHelper::Get()
