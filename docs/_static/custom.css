@@ -5,3 +5,7 @@ html[data-theme="light"] .highlight .c1 {
 img {
   margin-bottom: 1.15rem;
 }
+
+.row-odd {
+  background-color: var(--pst-color-background) !important;
+}
