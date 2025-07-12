@@ -1,5 +1,5 @@
-LychSim Plugin - Object API
-===========================
+Object API
+==========
 
 Baiscs
 ------
@@ -37,3 +37,15 @@ Getting Object Information
        - :code:`<obj_name>`: Name of the object.
      * - Returns
        - :code:`<x> <y> <z> <ex> <ey> <ez>`: 3D location and extents of the axis-aligned bounding box of the object.
+
+Modifying objects
+-----------------
+
+* :code:`lych object add <obj_name> <obj_path> <x> <y> <z> <p> <y> <r>` Add an object to the scene.
+
+  .. list-table::
+     :header-rows: 0
+     :widths: 25 75
+
+     * - Parameters
+       - :code:`<obj_name>`: Name of the new object; :code:`<obj_path>`: path to the object file; :code:`<x> <y> <z>`: 3D coordinates where the object will be placed; :code:`<p> <y> <r>`: pitch, yaw, and roll angles for the object's orientation.
