@@ -32,5 +32,7 @@ private:
 	/** Register vexec command */
 	void VExec(const TArray<FString>& Args);
 
+	void Lych(const TArray<FString>& Args);
+
 	void VBp(const TArray<FString>& Args);
 };

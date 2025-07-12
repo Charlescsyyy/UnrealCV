@@ -14,6 +14,8 @@ public:
 	FRotator GetRotation();
 	void SetRotation(FRotator NewRotation);
 
+	FBox GetAxisAlignedBoundingBox();
+
 	EComponentMobility::Type GetMobility();
 
 	void Show();

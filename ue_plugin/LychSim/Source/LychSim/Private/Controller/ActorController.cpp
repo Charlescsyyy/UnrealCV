@@ -28,6 +28,11 @@ void FActorController::SetRotation(FRotator Rotator)
 	Actor->SetActorRotation(Rotator);
 }
 
+FBox FActorController::GetAxisAlignedBoundingBox()
+{
+	return Actor->GetComponentsBoundingBox(true);
+}
+
 EComponentMobility::Type FActorController::GetMobility()
 {
 	return Actor->GetRootComponent()->Mobility.GetValue();

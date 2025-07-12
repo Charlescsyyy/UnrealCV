@@ -61,6 +61,13 @@ FConsoleHelper::FConsoleHelper()
 		// FConsoleCommandWithArgsDelegate::CreateStatic(VBp)
 		FConsoleCommandWithArgsDelegate::CreateRaw(this, &FConsoleHelper::VBp)
 		);
+
+	// LychSim entry point
+	IConsoleObject* LychCmd = IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("lych"),
+		TEXT("LychSim entry point"),
+		FConsoleCommandWithArgsDelegate::CreateRaw(this, &FConsoleHelper::Lych)
+	);
 }
 
 FConsoleHelper& FConsoleHelper::Get()
@@ -167,5 +174,33 @@ void FConsoleHelper::VExec(const TArray<FString>& Args)
 	Cmd += Args[NumArgs - 1];
 
 	FExecStatus ExecStatus = CommandDispatcher->Exec(Cmd);
+	GetConsole()->Log(ExecStatus.GetMessage());
+}
+
+void FConsoleHelper::Lych(const TArray<FString>& Args)
+{
+	if (!CommandDispatcher.IsValid())
+	{
+		UE_LOG(LogUnrealCV, Error, TEXT("CommandDispatcher not set"));
+		return;
+	}
+	// TODO: Is there any way to know which command trigger this handler?
+	// Join string
+	FString Cmd = "lych ";
+	uint32 NumArgs = Args.Num();
+	if (NumArgs == 0) return;
+
+	for (uint32 ArgIndex = 0; ArgIndex < NumArgs - 1; ArgIndex++)
+	{
+		Cmd += Args[ArgIndex] + " ";
+	}
+	Cmd += Args[NumArgs - 1]; // Maybe a more elegant implementation for joining string
+	
+	// FUnrealcvServer::Get().InitWorld();
+	FExecStatus ExecStatus = CommandDispatcher->Exec(Cmd);
+	UE_LOG(LogUnrealCV, Warning, TEXT("lych helper function, the real command is %s"), *Cmd);
+	
+	// In the console mode, output should be writen to the output log.
+	UE_LOG(LogUnrealCV, Warning, TEXT("%s"), *ExecStatus.GetMessage());
 	GetConsole()->Log(ExecStatus.GetMessage());
 }

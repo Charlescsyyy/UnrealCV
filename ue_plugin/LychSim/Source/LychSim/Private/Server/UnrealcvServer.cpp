@@ -16,6 +16,7 @@
 #include "WorldController.h"
 #include "UnrealcvLog.h"
 #include "UnrealcvStats.h"
+#include "Commands/LychSimObjectHandler.h"
 
 DECLARE_CYCLE_STAT(TEXT("FUnrealcvServer::Tick"), STAT_Tick, STATGROUP_UnrealCV);
 DECLARE_CYCLE_STAT(TEXT("FUnrealcvServer::ProcessRequest"), STAT_ProcessRequest, STATGROUP_UnrealCV);
@@ -83,6 +84,7 @@ void FUnrealcvServer::RegisterCommandHandlers()
 	CommandHandlers.Add(new FActionHandler());
 	CommandHandlers.Add(new FAliasHandler());
 	CommandHandlers.Add(new FCameraHandler());
+	CommandHandlers.Add(new FLychSimObjectHandler());
 	for (FCommandHandler* Handler : CommandHandlers)
 	{
 		Handler->CommandDispatcher = CommandDispatcher;
