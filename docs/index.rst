@@ -8,3 +8,4 @@ Welcome to the LychSim documentation!
    :caption: Contents
 
    tutorials/index
+   docs/index

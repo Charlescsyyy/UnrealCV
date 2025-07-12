@@ -6,5 +6,4 @@ Tutorials
    :caption: Contents
 
    installation
-   plugin/index
    integration/index

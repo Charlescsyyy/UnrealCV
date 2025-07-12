@@ -1,5 +1,5 @@
-LychSim Plugin API
-==================
+UE5 Plugin API
+==============
 
 .. toctree::
    :maxdepth: 1
