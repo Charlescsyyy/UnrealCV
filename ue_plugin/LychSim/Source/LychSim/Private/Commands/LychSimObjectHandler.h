@@ -13,4 +13,6 @@ private:
 
 	FExecStatus GetObjectLocation(const TArray<FString>& Args);
 	FExecStatus GetObjectAABB(const TArray<FString>& Args);
+
+	FExecStatus AddObject(const TArray<FString>& Args);
 };
