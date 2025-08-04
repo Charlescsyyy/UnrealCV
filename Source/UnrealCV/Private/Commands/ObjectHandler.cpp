@@ -269,9 +269,10 @@ FExecStatus FObjectHandler::GetAnnotationColor(const TArray<FString>& Args)
 	if (!Actor) return FExecStatus::Error("Can not find object");
 	FActorController Controller(Actor);
 
-	FColor AnnotationColor;
-	Controller.GetAnnotationColor(AnnotationColor);
-	return FExecStatus::OK(AnnotationColor.ToString());
+	    FColor AnnotationColor;
+    Controller.GetAnnotationColor(AnnotationColor);
+    FString ColorStr = FString::Printf(TEXT("(R=%d,G=%d,B=%d,A=%d)"), AnnotationColor.R, AnnotationColor.G, AnnotationColor.B, AnnotationColor.A);
+    return FExecStatus::OK(ColorStr);
 }
 
 FExecStatus FObjectHandler::SetAnnotationColor(const TArray<FString>& Args)
