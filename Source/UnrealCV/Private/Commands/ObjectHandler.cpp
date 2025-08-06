@@ -13,6 +13,7 @@
 #include "VisionBPLib.h"
 #include "CubeActor.h"
 #include "CommandInterface.h"
+#include "Utils/UObjectUtils.h"
 
 FExecStatus SetActorName(AActor* Actor, FString NewName)
 {
@@ -42,8 +43,37 @@ FExecStatus SetActorName(AActor* Actor, FString NewName)
 	return FExecStatus::OK();
 }
 
+FExecStatus FObjectHandler::GetRootActor(const TArray<FString>& Args)
+{
+    if (Args.Num() < 1)
+    {
+        return FExecStatus::Error(TEXT("No actor id provided"));
+    }
+
+    FString ActorId = Args[0];
+    UWorld* World = FUnrealcvServer::Get().GetWorld();
+    // 使用全局工具函数获取 Actor
+    AActor* Actor = GetActorById(World, ActorId);
+    if (!Actor) return FExecStatus::Error(TEXT("Can not find object"));
+
+    // 手动通过 GetAttachParentActor() 循环查找根节点
+    AActor* Root = Actor;
+    while (Root->GetAttachParentActor())
+    {
+        Root = Root->GetAttachParentActor();
+    }
+
+    return FExecStatus::OK(Root->GetName());
+}
+
+
 void FObjectHandler::RegisterCommands()
 {
+	CommandDispatcher->BindCommand(
+	    "vget /object/[str]/root",
+	    FDispatcherDelegate::CreateRaw(this, &FObjectHandler::GetRootActor),
+	    "Get the top-level root Actor name of this object"
+	);
 	CommandDispatcher->BindCommand(
 		"vget /objects",
 		FDispatcherDelegate::CreateRaw(this, &FObjectHandler::GetObjectList),
