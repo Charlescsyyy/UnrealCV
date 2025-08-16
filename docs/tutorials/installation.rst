@@ -18,7 +18,8 @@ Install and Compile LychSim Plugin
 
 2. **Add LychSim plugin source code to the Unreal project.**
 
-   - For windows users, link the code with the following command (with administrator privileges):
+   - First create the `Plugins` directory in your Unreal project folder.
+   - For windows users, link the code with the following command (in `cmd` with administrator privileges):
 
    .. code-block:: batch
 
