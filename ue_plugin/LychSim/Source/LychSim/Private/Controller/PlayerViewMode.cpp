@@ -18,20 +18,20 @@ UPlayerViewMode::UPlayerViewMode() : CurrentViewMode("lit")
 {
 	// Load material for visualization
 	TMap<FString, FString> MaterialPathMap;
-	MaterialPathMap.Add(TEXT("depth"), TEXT("Material'/UnrealCV/SceneDepthWorldUnits.SceneDepthWorldUnits'"));
-	MaterialPathMap.Add(TEXT("plane_depth"), TEXT("Material'/UnrealCV/ScenePlaneDepthWorldUnits.ScenePlaneDepthWorldUnits'"));
-	MaterialPathMap.Add(TEXT("vis_depth"), TEXT("Material'/UnrealCV/SceneDepth.SceneDepth'"));
-	MaterialPathMap.Add(TEXT("debug"), TEXT("Material'/UnrealCV/debug.debug'"));
-	// MaterialPathMap->Add(TEXT("object_mask"), TEXT("Material'/UnrealCV/VertexColorMaterial.VertexColorMaterial'"));
-	MaterialPathMap.Add(TEXT("normal"), TEXT("Material'/UnrealCV/WorldNormal.WorldNormal'"));
-	FString OpaqueMaterialName = "Material'/UnrealCV/OpaqueMaterial.OpaqueMaterial'";
+	MaterialPathMap.Add(TEXT("depth"), TEXT("Material'/LychSim/SceneDepthWorldUnits.SceneDepthWorldUnits'"));
+	MaterialPathMap.Add(TEXT("plane_depth"), TEXT("Material'/LychSim/ScenePlaneDepthWorldUnits.ScenePlaneDepthWorldUnits'"));
+	MaterialPathMap.Add(TEXT("vis_depth"), TEXT("Material'/LychSim/SceneDepth.SceneDepth'"));
+	MaterialPathMap.Add(TEXT("debug"), TEXT("Material'/LychSim/debug.debug'"));
+	// MaterialPathMap->Add(TEXT("object_mask"), TEXT("Material'/LychSim/VertexColorMaterial.VertexColorMaterial'"));
+	MaterialPathMap.Add(TEXT("normal"), TEXT("Material'/LychSim/WorldNormal.WorldNormal'"));
+	FString OpaqueMaterialName = "Material'/LychSim/OpaqueMaterial.OpaqueMaterial'";
 	MaterialPathMap.Add(TEXT("opaque"), OpaqueMaterialName);
 
 	for (auto& Elem : MaterialPathMap)
 	{
 		FString ModeName = Elem.Key;
 		FString MaterialPath = Elem.Value;
-		ConstructorHelpers::FObjectFinder<UMaterial> Material(*MaterialPath); 
+		ConstructorHelpers::FObjectFinder<UMaterial> Material(*MaterialPath);
 		// ConsturctorHelpers is only available in the CTOR of UObject.
 
 		if (Material.Object != NULL)
@@ -249,7 +249,7 @@ void UPlayerViewMode::VertexColor()
 
 void UPlayerViewMode::NoTransparency()
 {
-	// Iterate over all the materials in the scene and replace transparent materials to non-transparent 
+	// Iterate over all the materials in the scene and replace transparent materials to non-transparent
 	for (TActorIterator<AActor> ActorItr(FUnrealcvServer::Get().GetWorld()); ActorItr; ++ActorItr)
 	{
 		// Iterate over all the material of the actor

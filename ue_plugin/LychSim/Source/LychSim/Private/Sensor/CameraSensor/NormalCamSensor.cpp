@@ -4,7 +4,7 @@
 UNormalCamSensor::UNormalCamSensor(const FObjectInitializer& ObjectInitializer)
 : Super(ObjectInitializer)
 {
-	FString NormalPPMaterialPath = TEXT("Material'/UnrealCV/WorldNormal.WorldNormal'");
+	FString NormalPPMaterialPath = TEXT("Material'/LychSim/WorldNormal.WorldNormal'");
 	ConstructorHelpers::FObjectFinder<UMaterial> Material(*NormalPPMaterialPath);
 
 	// this->SurfaceNormalPPMaterial = Material.Object;

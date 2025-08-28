@@ -42,7 +42,7 @@ public:
 		ParentMeshType = EParentMeshType::None;
 
 		if (!IsValid(ParentComponent))
-		{ 
+		{
 			UE_LOG(LogTemp, Warning, TEXT("ParentComponent is invalid."));
 			return;
 		}
@@ -165,7 +165,7 @@ FPrimitiveViewRelevance FStaticAnnotationSceneProxy::GetViewRelevance(const FSce
 	if (View->Family->EngineShowFlags.Materials)
 	{
 		FPrimitiveViewRelevance ViewRelevance;
-		ViewRelevance.bDrawRelevance = 0; 
+		ViewRelevance.bDrawRelevance = 0;
 		// This will make the AnnotationComponent gets ignored if the Materials flag is on
 		// Which means it won't affect regulary rendering.
 		return ViewRelevance;
@@ -267,7 +267,7 @@ UAnnotationComponent::UAnnotationComponent(const FObjectInitializer& ObjectIniti
 	  // , ParentMeshInfo(nullptr)
 {
 	bSkeletalMesh = false;
-	FString MaterialPath = TEXT("Material'/UnrealCV/AnnotationColor.AnnotationColor'");
+	FString MaterialPath = TEXT("Material'/LychSim/AnnotationColor.AnnotationColor'");
 	static ConstructorHelpers::FObjectFinder<UMaterial> AnnotationMaterialObject(*MaterialPath);
 	if (AnnotationMaterialObject.Object == nullptr)
     {
@@ -306,7 +306,7 @@ void UAnnotationComponent::OnRegister()
 	// ParentMeshInfo = MakeShareable(new FParentMeshInfo(this->GetAttachParent()));
 }
 
-/** 
+/**
  * Note: The "exposure compensation" in "PostProcessVolume3" in the RR map will destroy the color
  * Saturate the color to 1. This is a mysterious behavior after tedious debug.
  */
@@ -462,14 +462,14 @@ void UAnnotationComponent::TickComponent(
 	enum ELevelTick TickType,
 	FActorComponentTickFunction * ThisTickFunction)
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction); 
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	if (bSkeletalMesh)
 	{
 		MarkRenderStateDirty(); // Without it will break the SkeletalMeshComponent
 	}
 	/*
-	// if (ParentMeshInfo->RequiresUpdate()) 
+	// if (ParentMeshInfo->RequiresUpdate())
 	// TODO: This sometimes miss a required update, see OWIMap. Not sure why.
 	// TODO: Per-frame update is certainly wasted.
 	{
