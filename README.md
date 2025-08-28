@@ -20,6 +20,8 @@
 
 ## Installation
 
+*See instructions [here](https://wufeim.github.io/LychSim/tutorials/installation.html).*
+
 ## Citation
 
 ## Acknowledgements
