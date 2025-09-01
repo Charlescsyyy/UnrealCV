@@ -65,3 +65,12 @@ Install and Compile LychSim Plugin
 
    .. figure:: figures/installation_02.png
       :align: center
+
+Install LychSim Python Package
+------------------------------
+
+From the root directory of the repository, run:
+
+.. code-block:: bash
+
+   pip install -e .
