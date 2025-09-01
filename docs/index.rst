@@ -9,3 +9,4 @@ Welcome to the LychSim documentation!
 
    tutorials/index
    docs/index
+   known_issues
