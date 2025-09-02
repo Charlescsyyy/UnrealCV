@@ -49,3 +49,14 @@ Modifying objects
 
      * - Parameters
        - :code:`<obj_name>`: Name of the new object; :code:`<obj_path>`: path to the object file; :code:`<x> <y> <z>`: 3D coordinates where the object will be placed; :code:`<p> <y> <r>`: pitch, yaw, and roll angles for the object's orientation.
+       
+Getting part and object level segmentations
+-------------------------------------------
+
+* :code:`vset /segmentation/mode object` Set segmentation mode to object level.
+
+* :code:`vset /segmentation/mode part` Set segmentation mode to part level.
+
+After setting the segmentation mode, you can use the following command to get the segmentation image.
+
+* :code:`vget /camera/1/object_mask png`
