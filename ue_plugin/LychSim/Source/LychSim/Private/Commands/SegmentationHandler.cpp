@@ -19,6 +19,19 @@ void FSegmentationHandler::RegisterCommands()
         FDispatcherDelegate::CreateRaw(this, &FSegmentationHandler::GetMode),
         "Get current segmentation mode"
     );
+
+    // Lych aliases
+    CommandDispatcher->BindCommand(
+        "lych /segmentation/mode [str]",
+        FDispatcherDelegate::CreateRaw(this, &FSegmentationHandler::SetMode),
+        "[alias] Set segmentation mode (part | object)"
+    );
+
+    CommandDispatcher->BindCommand(
+        "lych /segmentation/mode",
+        FDispatcherDelegate::CreateRaw(this, &FSegmentationHandler::GetMode),
+        "[alias] Get current segmentation mode"
+    );
 }
 
 FExecStatus FSegmentationHandler::SetMode(const TArray<FString>& Args)

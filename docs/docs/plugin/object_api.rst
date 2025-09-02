@@ -53,10 +53,10 @@ Modifying objects
 Getting part and object level segmentations
 -------------------------------------------
 
-* :code:`vset /segmentation/mode object` Set segmentation mode to object level.
+* :code:`lych /segmentation/mode object` Set segmentation mode to object level.
 
-* :code:`vset /segmentation/mode part` Set segmentation mode to part level.
+* :code:`lych /segmentation/mode part` Set segmentation mode to part level.
 
 After setting the segmentation mode, you can use the following command to get the segmentation image.
 
-* :code:`vget /camera/1/object_mask png`
+* :code:`lych /camera/1/object_mask png`

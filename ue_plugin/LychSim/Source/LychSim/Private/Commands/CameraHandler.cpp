@@ -804,10 +804,20 @@ void FCameraHandler::RegisterCommands()
 		"Get object mask from camera sensor");
 
 	CommandDispatcher->BindCommand(
-		"vset /viewmode [str]",
-		FDispatcherDelegate::CreateRaw(this, &FCameraHandler::SetPlayerViewMode),
-		"Set ViewMode to (lit, normal, depth, object_mask)"
-	);
+        "lych /camera/[uint]/object_mask [str]",
+        FDispatcherDelegate::CreateRaw(this, &FCameraHandler::GetCameraObjMask),
+        "[alias] Get object mask from camera sensor");
+
+    CommandDispatcher->BindCommand(
+        "lych /camera/[uint]/seg [str]",
+        FDispatcherDelegate::CreateRaw(this, &FCameraHandler::GetCameraObjMask),
+        "[alias] Get object mask from camera sensor");
+
+    CommandDispatcher->BindCommand(
+        "vset /viewmode [str]",
+        FDispatcherDelegate::CreateRaw(this, &FCameraHandler::SetPlayerViewMode),
+        "Set ViewMode to (lit, normal, depth, object_mask)"
+    );
 
 	CommandDispatcher->BindCommand(
 		"vget /viewmode",
