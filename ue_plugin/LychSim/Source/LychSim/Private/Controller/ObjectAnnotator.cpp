@@ -4,7 +4,9 @@
 #include "Runtime/Launch/Resources/Version.h"
 #include "Component/AnnotationComponent.h"
 #include "UnrealcvLog.h"
-
+//add for part segmentation,for object traverse and scene compoents
+#include "UObject/UObjectIterator.h"
+#include "Components/SceneComponent.h"
 // For UE4 < 17
 // check https://github.com/unrealcv/unrealcv/blob/1369a72be8428547318d8a52ae2d63e1eb57a001/Source/UnrealCV/Private/Controller/ObjectAnnotator.cpp#L1
 
@@ -327,3 +329,51 @@ FColor FColorGenerator::GetColorFromColorMap(int32 ObjectIndex)
 	}
 	return ColorMap[ObjectIndex];
 }
+
+
+//Added for part segmentation, colored grouped actors with the same color
+void FObjectAnnotator::AnnotateGroupedActors(UWorld* World)
+{
+	    if (!IsValid(World)) return;
+	    TMap<AActor*, FColor> RootColor;
+	    for (TActorIterator<AActor> It(World); It; ++It)
+		    {
+			        AActor* Actor = *It;
+			        if (!IsValid(Actor)) continue;
+			        // 寻找最顶层的 attachment root
+			        AActor* Root = Actor;
+			        while (Root->GetAttachParentActor())
+				            Root = Root->GetAttachParentActor();
+			        FColor* Existing = RootColor.Find(Root);
+			        FColor Col;
+			        if (Existing)
+				        {
+					            Col = *Existing;
+					        }
+			        else
+				        {
+					            Col = GetDefaultColor(Root);
+					            RootColor.Add(Root, Col);
+					        }
+			        SetAnnotationColor(Actor, Col);
+			        AnnotationColors.Emplace(Actor->GetName(), Col);
+			    }
+	    UE_LOG(LogUnrealCV, Log, TEXT("AnnotateGroupedActors: processed %d root groups"), RootColor.Num());
+	}
+
+/*** 新增：清理所有 AnnotationComponent（重标注前先调用）***/
+void FObjectAnnotator::ClearAnnotations(UWorld* World)
+{
+	    if (!IsValid(World)) return;
+	    AnnotationColors.Empty();
+	    int32 Count = 0;
+	    for (TObjectIterator<UAnnotationComponent> It; It; ++It)
+		    {
+			        UAnnotationComponent* Comp = *It;
+			        if (!IsValid(Comp)) continue;
+			        if (Comp->GetWorld() != World) continue;
+			        Comp->DestroyComponent();
+			        Count++;
+			    }
+	    UE_LOG(LogUnrealCV, Log, TEXT("ClearAnnotations: removed %d comps"), Count);
+	}

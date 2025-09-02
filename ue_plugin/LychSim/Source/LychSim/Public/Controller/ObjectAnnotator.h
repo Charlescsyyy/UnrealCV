@@ -38,6 +38,11 @@ public:
 	// Get annotation color for an actor
 	void GetAnnotationColor(AActor* Actor, FColor& AnnotationColor);
 
+	//For part segmentation, clean all the AnnotationComponnets in the current world, and clear the color map
+	void ClearAnnotations(UWorld* World);
+
+	// Annotate grouped actors with the same color,for object segmentation
+	void AnnotateGroupedActors(UWorld* World);
 	TMap<FString, FColor> GetAnnotationColors() { return AnnotationColors; }
 
 private:
@@ -62,5 +67,5 @@ private:
 	FColor GetDefaultColor(AActor* Actor);
 
 private:
-	TMap<FString, FColor> AnnotationColors; // Store annotation data
+	TMap<FString, FColor> AnnotationColors; // Store annotation data (ActorName->Color)
 };
