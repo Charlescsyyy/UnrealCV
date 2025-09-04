@@ -1,7 +1,7 @@
 Object API
 ==========
 
-Baiscs
+Basics
 ------
 
 * :code:`lych object list` List all objects in the scene.
