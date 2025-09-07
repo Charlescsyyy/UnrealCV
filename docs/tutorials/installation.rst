@@ -4,7 +4,7 @@ Installation
 Install UE5
 -----------
 
-Install Unreal Engine 5 from :ref:`Unreal Engine website <https://www.unrealengine.com/en-US>`_.
+Install Unreal Engine 5 from `Unreal Engine website <https://www.unrealengine.com/en-US>`_.
 
 Current LychSim plugin is only tested with Unreal Engine :code:`5.5.4` on Windows. MacOS should also be supported, but it is not officially tested.
 
