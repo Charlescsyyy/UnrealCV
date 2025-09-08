@@ -7,6 +7,7 @@ Welcome to the LychSim documentation!
    :maxdepth: 2
    :caption: Contents
 
+   intro
    tutorials/index
    docs/index
    known_issues
