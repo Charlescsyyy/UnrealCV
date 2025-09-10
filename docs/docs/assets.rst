@@ -16,6 +16,7 @@ Scenes (Indoor)
    * House Interior 2 :bdg-green-line:`recommended`
       * `UE5 Fab <https://www.fab.com/listings/f5d42569-dcb2-4ddf-b89b-3be803c63de9>`_
       * Available in :code:`House_Interior_2.zip`
+      * Need to adjust exposure compensation to `1.0`: (1) select `PostProcessVolume` in the World Outliner; (2) in the Details panel, search for `Exposure`; (3) set `Exposure Compensation` to `1.0`.
    * House Furniture :bdg-deeporange-line:`known issue`
       * `UE5 Fab <https://www.fab.com/listings/7990c054-90fb-4b34-948e-55f963f67a6c>`_
       * Available in :code:`House_Furniture.zip`
