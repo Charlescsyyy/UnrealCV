@@ -10,6 +10,12 @@ Scenes (Indoor)
    * Stylized House Interior :bdg-green-line:`recommended`
       * `UE5 Fab <https://www.fab.com/listings/ab92e5d3-6db6-4cf3-bff5-c2c98ae8db5b>`_
       * Available in :code:`Stylized_House_Interior.zip`
+   * House Props & Furniture Vol. 2 :bdg-green-line:`recommended`
+      * `UE5 Fab <https://www.fab.com/listings/4ea826d0-5eee-4a5a-b8cb-2e0c4be112e3>`_
+      * Available in :code:`House_Props_Furniture_Vol2.zip`
+   * House Interior 2 :bdg-green-line:`recommended`
+      * `UE5 Fab <https://www.fab.com/listings/f5d42569-dcb2-4ddf-b89b-3be803c63de9>`_
+      * Available in :code:`House_Interior_2.zip`
    * House Furniture :bdg-deeporange-line:`known issue`
       * `UE5 Fab <https://www.fab.com/listings/7990c054-90fb-4b34-948e-55f963f67a6c>`_
       * Available in :code:`House_Furniture.zip`
