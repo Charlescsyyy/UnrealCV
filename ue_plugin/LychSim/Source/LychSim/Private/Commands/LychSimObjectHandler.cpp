@@ -15,7 +15,7 @@ void FLychSimObjectHandler::RegisterCommands()
 		FDispatcherDelegate::CreateRaw(this, &FLychSimObjectHandler::ListObjects),
 		"Get a list of all objects."
 	);
-	
+
 	CommandDispatcher->BindCommand(
 		"lych object get_loc [str]",
 		FDispatcherDelegate::CreateRaw(this, &FLychSimObjectHandler::GetObjectLocation),
@@ -32,6 +32,12 @@ void FLychSimObjectHandler::RegisterCommands()
 		"lych object add [str] [str] [str] [str] [str] [str] [str] [str]",
 		FDispatcherDelegate::CreateRaw(this, &FLychSimObjectHandler::AddObject),
 		"Add object to the scene."
+	);
+
+	CommandDispatcher->BindCommand(
+		"lych object set_material [str] [str] [str]",
+		FDispatcherDelegate::CreateRaw(this, &FLychSimObjectHandler::SetObjectMaterial),
+		"Set object material."
 	);
 }
 
@@ -173,4 +179,32 @@ FExecStatus FLychSimObjectHandler::AddObject(const TArray<FString>& Args)
 	NewActor->InitializeMesh(ObjectPath);
 
 	return FExecStatus::OK();
+}
+
+FExecStatus FLychSimObjectHandler::SetObjectMaterial(const TArray<FString>& Args)
+{
+	FString ObjectName, MaterialPath;
+	int ElementIdx;
+
+	if (Args.Num() == 3) {
+		ObjectName = Args[0];
+		MaterialPath = Args[1];
+		ElementIdx = FCString::Atoi(*Args[2]);
+	}
+	else {
+		return FExecStatus::Error("Usage: lych object set_material [str] [str] [int]");
+	}
+
+	AActor* Actor = LychSimGetActor(Args);
+	if (!Actor) return FExecStatus::Error("Object not found");
+
+	UMeshComponent* MC = Actor->FindComponentByClass<UMeshComponent>();
+	if (!MC) return FExecStatus::Error("No mesh component");
+
+	UMaterialInterface* MI = Cast<UMaterialInterface>(
+        StaticLoadObject(UMaterialInterface::StaticClass(), nullptr, *MaterialPath));
+    if (!MI) return FExecStatus::Error("Material not found");
+
+	MC->SetMaterial(ElementIdx, MI);
+    return FExecStatus::OK("OK");
 }

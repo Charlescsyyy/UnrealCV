@@ -15,4 +15,6 @@ private:
 	FExecStatus GetObjectAABB(const TArray<FString>& Args);
 
 	FExecStatus AddObject(const TArray<FString>& Args);
+
+	FExecStatus SetObjectMaterial(const TArray<FString>& Args);
 };
