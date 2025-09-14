@@ -35,7 +35,7 @@ void FLychSimObjectHandler::RegisterCommands()
 	);
 
 	CommandDispatcher->BindCommand(
-		"lych object set_material [str] [str] [str]",
+		"lych object set_mtl [str] [str] [str]",
 		FDispatcherDelegate::CreateRaw(this, &FLychSimObjectHandler::SetObjectMaterial),
 		"Set object material."
 	);

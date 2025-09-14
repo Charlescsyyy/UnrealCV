@@ -50,7 +50,7 @@ Modifying objects
      * - Parameters
        - :code:`<obj_name>`: Name of the new object; :code:`<obj_path>`: path to the object file; :code:`<x> <y> <z>`: 3D coordinates where the object will be placed; :code:`<p> <y> <r>`: pitch, yaw, and roll angles for the object's orientation.
 
-* :code:`lych object set_material <obj_name> <material_path> <element_idx>` Set material of an object.
+* :code:`lych object set_mtl <obj_name> <material_path> <element_idx>` Set material of an object.
 
 .. list-table::
      :header-rows: 0
