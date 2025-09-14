@@ -5,4 +5,5 @@ UE5 Plugin API
    :maxdepth: 1
    :caption: Contents
 
+   camera_api
    object_api
