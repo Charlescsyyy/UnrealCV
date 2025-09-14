@@ -22,3 +22,15 @@ inline FStrFormatter& operator<<(FStrFormatter& Ar, FRotator& Rotator)
 	Ar.Str += FString::Printf(TEXT("%.3f %.3f %.3f"), Rotator.Pitch, Rotator.Yaw, Rotator.Roll);
 	return Ar;
 }
+
+inline FStrFormatter& operator<<(FStrFormatter& Ar, FMatrix& Mat)
+{
+	for (int Row = 0; Row < 4; Row++)
+	{
+		for (int Col = 0; Col < 4; Col++)
+		{
+			Ar.Str += FString::Printf(TEXT("%.6f "), Mat.M[Col][Row]);
+		}
+	}
+	return Ar;
+}
