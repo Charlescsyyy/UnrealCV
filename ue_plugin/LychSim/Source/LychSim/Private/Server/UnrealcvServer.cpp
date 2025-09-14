@@ -19,6 +19,7 @@
 #include "Commands/LychSimObjectHandler.h"
 #include "Commands/LychSimUtilsHandler.h"
 #include "Commands/SegmentationHandler.h"
+#include "Commands/LychSimCameraHandler.h"
 
 DECLARE_CYCLE_STAT(TEXT("FUnrealcvServer::Tick"), STAT_Tick, STATGROUP_UnrealCV);
 DECLARE_CYCLE_STAT(TEXT("FUnrealcvServer::ProcessRequest"), STAT_ProcessRequest, STATGROUP_UnrealCV);
@@ -88,6 +89,7 @@ void FUnrealcvServer::RegisterCommandHandlers()
 	CommandHandlers.Add(new FCameraHandler());
 	CommandHandlers.Add(new FLychSimObjectHandler());
 	CommandHandlers.Add(new FLychSimUtilsHandler());
+	CommandHandlers.Add(new FLychSimCameraHandler());
 	CommandHandlers.Add(new FSegmentationHandler());
 	for (FCommandHandler* Handler : CommandHandlers)
 	{
@@ -116,7 +118,7 @@ FUnrealcvServer::~FUnrealcvServer()
 
 // TODO: Write an article to explain this.
 /** Select and return and most suitable world for current condition
- * GWorld returns the EditorWorld in the Editor, which is usually not what we need. 
+ * GWorld returns the EditorWorld in the Editor, which is usually not what we need.
  */
 UWorld* FUnrealcvServer::GetWorld()
 {
@@ -282,7 +284,7 @@ void FUnrealcvServer::ProcessRequest(FRequest& Request)
 void FUnrealcvServer::ProcessPendingRequest()
 {
 	// Process all requests collected in this frame
-	while (!PendingRequest.IsEmpty()) 
+	while (!PendingRequest.IsEmpty())
 	{
 		// if (!InitWorld()) break;
 
@@ -295,8 +297,8 @@ void FUnrealcvServer::ProcessPendingRequest()
 		// vbatch should not stall the execution of the game thread.
 		if (Request.Message.StartsWith(TEXT("vbatch"))) // vbatch should not be nested.
 		{
-			// Check whether it is a batch request. 
-			// Run all requests until all commands are received, 
+			// Check whether it is a batch request.
+			// Run all requests until all commands are received,
 			// so that all commands can be run in the same frame
 			BatchNum = FCString::Atoi(*Request.Message.Replace(TEXT("vbatch"), TEXT("")));
 			if (BatchNum < 1)
@@ -315,14 +317,14 @@ void FUnrealcvServer::ProcessPendingRequest()
 			BatchNum = 1;
 		}
 
-		if (BatchNum > 0) 
+		if (BatchNum > 0)
 		// Keep collecting commands until the batch is ready
 		// inside batch mode
 		{
 			Batch.Add(Request);
 			BatchNum -= 1;
 		}
-		
+
 		if (BatchNum == 0) // The batch is ready
 		{
 			// Otherwise hold the batch request until all commands are received.
