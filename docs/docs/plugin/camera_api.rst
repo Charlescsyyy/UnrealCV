@@ -1,4 +1,4 @@
-Object API
+Camera API
 ==========
 
 Getting Camera Information
