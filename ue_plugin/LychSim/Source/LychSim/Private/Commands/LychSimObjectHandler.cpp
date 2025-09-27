@@ -29,6 +29,12 @@ void FLychSimObjectHandler::RegisterCommands()
 	);
 
 	CommandDispatcher->BindCommand(
+		"lych object get_obb [str]",
+		FDispatcherDelegate::CreateRaw(this, &FLychSimObjectHandler::GetObjectOBB),
+		"Get object oriented bounding box [center(3), extent(3), rotation_matrix(9)]."
+	);
+
+	CommandDispatcher->BindCommand(
 		"lych object add [str] [str] [str] [str] [str] [str] [str] [str]",
 		FDispatcherDelegate::CreateRaw(this, &FLychSimObjectHandler::AddObject),
 		"Add object to the scene."
@@ -120,6 +126,29 @@ FExecStatus FLychSimObjectHandler::GetObjectAABB(const TArray<FString>& Args)
 	Ar2 << Extent;
 
 	return FExecStatus::OK(Ar1.ToString() + " " + Ar2.ToString());
+}
+
+FExecStatus FLychSimObjectHandler::GetObjectOBB(const TArray<FString>& Args)
+{
+	AActor* Actor = LychSimGetActor(Args);
+	if (!Actor) return FExecStatus::Error("Object not found");
+
+	FVector Center;
+	FVector Extent;
+	Actor->GetActorBounds(false, Center, Extent);
+
+	FRotator Rotator = Actor->GetActorRotation();
+
+	FStrFormatter Ar1;
+	Ar1 << Center;
+
+	FStrFormatter Ar2;
+	Ar2 << Extent;
+
+	FStrFormatter Ar3;
+	Ar3 << Rotator;
+
+	return FExecStatus::OK(Ar1.ToString() + " " + Ar2.ToString() + " " + Ar3.ToString());
 }
 
 FExecStatus FLychSimObjectHandler::AddObject(const TArray<FString>& Args)
