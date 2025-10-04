@@ -221,7 +221,7 @@ FExecStatus FLychSimObjectHandler::SetObjectMaterial(const TArray<FString>& Args
 		ElementIdx = FCString::Atoi(*Args[2]);
 	}
 	else {
-		return FExecStatus::Error("Usage: lych object set_material [str] [str] [int]");
+		return FExecStatus::Error("Usage: lych object set_mtl [str] [str] [int]");
 	}
 
 	AActor* Actor = LychSimGetActor(Args);
