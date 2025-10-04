@@ -14,4 +14,6 @@ private:
     FExecStatus GetCameraRotation(const TArray<FString>& Args);
     FExecStatus GetCameraFOV(const TArray<FString>& Args);
     FExecStatus GetCameraC2W(const TArray<FString>& Args);
+
+    FExecStatus SetFilmSize(const TArray<FString>& Args);
 };

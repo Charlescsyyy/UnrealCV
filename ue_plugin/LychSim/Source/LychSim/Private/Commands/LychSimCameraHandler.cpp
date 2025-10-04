@@ -27,6 +27,12 @@ void FLychSimCameraHandler::RegisterCommands() {
 		FDispatcherDelegate::CreateRaw(this, &FLychSimCameraHandler::GetCameraC2W),
 		"Get camera C2W transform"
     );
+
+	CommandDispatcher->BindCommand(
+		"lych cam set_film_size [uint] [uint] [uint]",
+		FDispatcherDelegate::CreateRaw(this, &FLychSimCameraHandler::SetFilmSize),
+		"Set Camera Film Size"
+	);
 }
 
 UFusionCamSensor* FLychSimCameraHandler::GetCamera(const TArray<FString>& Args, FExecStatus& Status)
@@ -92,4 +98,18 @@ FExecStatus FLychSimCameraHandler::GetCameraC2W(const TArray<FString>& Args)
     FStrFormatter Ar;
 	Ar << C2W;
 	return FExecStatus::OK(Ar.ToString());
+}
+
+FExecStatus FLychSimCameraHandler::SetFilmSize(const TArray<FString>& Args)
+{
+	FExecStatus Status = FExecStatus::InvalidArgument;
+	UFusionCamSensor* FusionCamSensor = GetCamera(Args, Status);
+	if (!IsValid(FusionCamSensor)) return FExecStatus::InvalidArgument;
+
+	if (Args.Num() != 3) return FExecStatus::InvalidArgument; // ID, Width, Height
+
+	int Width = FCString::Atof(*Args[1]);
+	int Height = FCString::Atof(*Args[2]);
+	FusionCamSensor->SetFilmSize(Width, Height);
+	return FExecStatus::OK();
 }
