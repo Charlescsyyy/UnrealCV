@@ -28,7 +28,7 @@ ULitCamSensor::ULitCamSensor(const FObjectInitializer& ObjectInitializer) :
 
 void ULitCamSensor::InitTextureTarget(int filmWidth, int filmHeight)
 {
-	TextureTarget = NewObject<UTextureRenderTarget2D>(this); 
+	TextureTarget = NewObject<UTextureRenderTarget2D>(this);
 	TextureTarget->InitAutoFormat(filmWidth, filmHeight);
 	TextureTarget->TargetGamma = GEngine->GetDisplayGamma();
 }
@@ -45,9 +45,19 @@ void ULitCamSensor::CaptureLit(TArray<FColor>& Image, int& Width, int& Height)
 			return;
 		}
 	}
+	this->bCaptureEveryFrame = true;
+	this->bAlwaysPersistRenderingState = true;
+	this->bUseRayTracingIfEnabled = true;
+
+	this->CaptureSource = ESceneCaptureSource::SCS_FinalColorLDR;
+	this->PostProcessSettings.bOverride_DynamicGlobalIlluminationMethod = true;
+	this->PostProcessSettings.DynamicGlobalIlluminationMethod = EDynamicGlobalIlluminationMethod::Lumen;
+	this->PostProcessSettings.bOverride_ReflectionMethod = true;
+	this->PostProcessSettings.ReflectionMethod = EReflectionMethod::Lumen;
+
 	this->CaptureScene();
 	FReadSurfaceDataFlags ReadSurfaceDataFlags;
-	ReadSurfaceDataFlags.SetLinearToGamma(false); 
+	ReadSurfaceDataFlags.SetLinearToGamma(false);
 	// TextureTarget->GetRenderTargetResource()->ReadPixels(Image, ReadSurfaceDataFlags);
 	TextureTarget->GameThread_GetRenderTargetResource()->ReadPixels(Image, ReadSurfaceDataFlags);
 	if (Image.Num() == 0)
