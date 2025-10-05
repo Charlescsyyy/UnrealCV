@@ -47,87 +47,87 @@ public:
 	virtual bool GetEditorPreviewInfo(float DeltaTime, FMinimalViewInfo& ViewOut);
 
 	/** Get rgb data */
-	UFUNCTION(BlueprintPure, Category = "unrealcv")
+	UFUNCTION(BlueprintPure, Category = "lychsim")
 	void GetLit(TArray<FColor>& LitData, int& InOutWidth, int& InOutHeight, ELitMode LitMode = ELitMode::Lit);
 
 	/** Get depth data */
-	UFUNCTION(BlueprintPure, Category = "unrealcv")
+	UFUNCTION(BlueprintPure, Category = "lychsim")
 	void GetDepth(TArray<float>& DepthData, int& InOutWidth, int& InOutHeight, EDepthMode DepthMode = EDepthMode::PlaneDepth);
 
 	/** Get surface normal data */
-	UFUNCTION(BlueprintPure, Category = "unrealcv")
+	UFUNCTION(BlueprintPure, Category = "lychsim")
 	void GetNormal(TArray<FColor>& NormalData, int& Width, int& Height);
 
 	/** Get object mask data, the annotation color can be extracted from FObjectAnnotator */
-	UFUNCTION(BlueprintPure, Category = "unrealcv")
+	UFUNCTION(BlueprintPure, Category = "lychsim")
 	void GetSeg(TArray<FColor>& ObjMaskData, int& Width, int& Height, ESegMode SegMode = ESegMode::AnnotationComponent);
 
-	UFUNCTION(BlueprintPure, Category = "unrealcv")
+	UFUNCTION(BlueprintPure, Category = "lychsim")
 	FVector GetSensorLocation();
 
-	UFUNCTION(BlueprintPure, Category = "unrealcv")
+	UFUNCTION(BlueprintPure, Category = "lychsim")
 	FRotator GetSensorRotation();
 
-	UFUNCTION(BlueprintCallable, Category = "unrealcv")
+	UFUNCTION(BlueprintCallable, Category = "lychsim")
 	void SetSensorLocation(FVector Location);
 
-	UFUNCTION(BlueprintCallable, Category = "unrealcv")
+	UFUNCTION(BlueprintCallable, Category = "lychsim")
 	void SetSensorRotation(FRotator Rotator);
 
-	UFUNCTION(BlueprintCallable, Category = "unrealcv")
+	UFUNCTION(BlueprintCallable, Category = "lychsim")
 	void SetFilmSize(int Width, int Height);
 
-	UFUNCTION(BlueprintCallable, Category = "unrealcv")
+	UFUNCTION(BlueprintCallable, Category = "lychsim")
 	float GetFilmWidth() { return FilmWidth; }
 
-	UFUNCTION(BlueprintCallable, Category = "unrealcv")
+	UFUNCTION(BlueprintCallable, Category = "lychsim")
 	float GetFilmHeight() { return FilmHeight; }
 
-	UFUNCTION(BlueprintCallable, Category = "unrealcv")
+	UFUNCTION(BlueprintCallable, Category = "lychsim")
 	float GetSensorFOV();
 
-	UFUNCTION(BlueprintCallable, Category = "unrealcv")
+	UFUNCTION(BlueprintCallable, Category = "lychsim")
 	void SetSensorFOV(float FOV);
 
-	UFUNCTION(BlueprintCallable, Category = "unrealcv")
+	UFUNCTION(BlueprintCallable, Category = "lychsim")
 	void SetProjectionType(ECameraProjectionMode::Type ProjectionType);
 
-	UFUNCTION(BlueprintCallable, Category = "unrealcv")
+	UFUNCTION(BlueprintCallable, Category = "lychsim")
 	void SetOrthoWidth(float OrthoWidth);
 
-	UFUNCTION(BlueprintCallable, Category = "unrealcv")
+	UFUNCTION(BlueprintCallable, Category = "lychsim")
 	void SetLitCaptureSource(ESceneCaptureSource CaptureSource);
 
-    UFUNCTION(BlueprintCallable, Category = "unrealcv")
+    UFUNCTION(BlueprintCallable, Category = "lychsim")
     void SetReflectionMethod(EReflectionMethod::Type Method);
 
-    UFUNCTION(BlueprintCallable, Category = "unrealcv")
+    UFUNCTION(BlueprintCallable, Category = "lychsim")
     void SetGlobalIlluminationMethod(EDynamicGlobalIlluminationMethod::Type Method);
 
-    UFUNCTION(BlueprintCallable, Category = "unrealcv")
+    UFUNCTION(BlueprintCallable, Category = "lychsim")
 	void SetExposureMethod(EAutoExposureMethod ExposureMethod);
 
-	UFUNCTION(BlueprintCallable, Category = "unrealcv")
+	UFUNCTION(BlueprintCallable, Category = "lychsim")
 	void SetExposureBias(float ExposureBias);
 
-	UFUNCTION(BlueprintCallable, Category = "unrealcv")
+	UFUNCTION(BlueprintCallable, Category = "lychsim")
 	void SetAutoExposureSpeed(float ExposureSpeedDown, float ExposureSpeedUp);
 
-	UFUNCTION(BlueprintCallable, Category = "unrealcv")
+	UFUNCTION(BlueprintCallable, Category = "lychsim")
 	void SetAutoExposureBrightness(float MinBrightness, float MaxBrightness);
 
-	UFUNCTION(BlueprintCallable, Category = "unrealcv")
+	UFUNCTION(BlueprintCallable, Category = "lychsim")
 	void SetApplyPhysicalCameraExposure(int ApplyPhysicalCameraExposure);
 
-	UFUNCTION(BlueprintCallable, Category = "unrealcv")
+	UFUNCTION(BlueprintCallable, Category = "lychsim")
 	void SetMotionBlurParams(float MotionBlurAmount, float MotionBlurMax, float MotionBlurPerObjectSize, int MotionBlurTargetFPS);
 
-    UFUNCTION(BlueprintCallable, Category = "unrealcv")
+    UFUNCTION(BlueprintCallable, Category = "lychsim")
     void SetFocalParams(float FocalDistance, float FocalRegion);
-	// UFUNCTION(BlueprintPure, Category = "unrealcv")
+	// UFUNCTION(BlueprintPure, Category = "lychsim")
 	// float GetFilmHeight();
 
-	// UFUNCTION(BlueprintPure, Category = "unrealcv")
+	// UFUNCTION(BlueprintPure, Category = "lychsim")
 	// float GetFilmWidth();
 
 	// void SetFilmSize(int Width, int Height);
@@ -145,32 +145,32 @@ public:
 #endif
 
 private:
-	UPROPERTY(EditInstanceOnly, meta=(AllowPrivateAccess = "true"), Category = "unrealcv")
+	UPROPERTY(EditInstanceOnly, meta=(AllowPrivateAccess = "true"), Category = "lychsim")
 	EPresetFilmSize PresetFilmSize;
 
-	UPROPERTY(EditInstanceOnly, meta=(AllowPrivateAccess = "true"), Category = "unrealcv")
+	UPROPERTY(EditInstanceOnly, meta=(AllowPrivateAccess = "true"), Category = "lychsim")
 	int FilmWidth;
 
-	UPROPERTY(EditInstanceOnly, meta=(AllowPrivateAccess = "true"), Category = "unrealcv")
+	UPROPERTY(EditInstanceOnly, meta=(AllowPrivateAccess = "true"), Category = "lychsim")
 	int FilmHeight;
 
-	UPROPERTY(EditInstanceOnly, meta=(AllowPrivateAccess = "true"), Category = "unrealcv")
+	UPROPERTY(EditInstanceOnly, meta=(AllowPrivateAccess = "true"), Category = "lychsim")
 	float FOV;
 
 protected:
 	UPROPERTY()
 	TArray<class UBaseCameraSensor*> FusionSensors;
 
-	UPROPERTY(EditDefaultsOnly, Category = "unrealcv")
+	UPROPERTY(EditDefaultsOnly, Category = "lychsim")
 	class UDepthCamSensor* DepthCamSensor;
 
-	UPROPERTY(EditDefaultsOnly, Category = "unrealcv")
+	UPROPERTY(EditDefaultsOnly, Category = "lychsim")
 	class UNormalCamSensor* NormalCamSensor;
 
-	UPROPERTY(EditDefaultsOnly, Category = "unrealcv")
+	UPROPERTY(EditDefaultsOnly, Category = "lychsim")
 	class UAnnotationCamSensor* AnnotationCamSensor;
 
-	UPROPERTY(EditDefaultsOnly, Category = "unrealcv")
+	UPROPERTY(EditDefaultsOnly, Category = "lychsim")
 	class ULitCamSensor* LitCamSensor;
 
 	/** This preview camera is used for UE version < 4.17 which only support UCameraComponent PIP preview
