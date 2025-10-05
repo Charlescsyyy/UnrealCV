@@ -1,6 +1,10 @@
 #include "LychSimCameraHandler.h"
+#include "CameraHandler.h"
 #include "FusionCamSensor.h"
+#include "ImageUtil.h"
 #include "SensorBPLib.h"
+#include "Serialization.h"
+#include "Utils/DataUtil.h"
 #include "Utils/StrFormatter.h"
 
 void FLychSimCameraHandler::RegisterCommands() {
@@ -32,6 +36,18 @@ void FLychSimCameraHandler::RegisterCommands() {
 		"lych cam set_film_size [uint] [uint] [uint]",
 		FDispatcherDelegate::CreateRaw(this, &FLychSimCameraHandler::SetFilmSize),
 		"Set Camera Film Size"
+	);
+
+	CommandDispatcher->BindCommand(
+		"lych cam get_lit [uint] [str]",
+		FDispatcherDelegate::CreateRaw(this, &FLychSimCameraHandler::GetCameraLit),
+		"Get png rendering data from lit sensor"
+	);
+
+	CommandDispatcher->BindCommand(
+		"lych cam get_seg [uint] [str]",
+		FDispatcherDelegate::CreateRaw(this, &FLychSimCameraHandler::GetCameraSeg),
+		"Get png segmentation data from annotation sensor"
 	);
 }
 
@@ -112,4 +128,31 @@ FExecStatus FLychSimCameraHandler::SetFilmSize(const TArray<FString>& Args)
 	int Height = FCString::Atof(*Args[2]);
 	FusionCamSensor->SetFilmSize(Width, Height);
 	return FExecStatus::OK();
+}
+
+FExecStatus FLychSimCameraHandler::GetCameraLit(const TArray<FString>& Args)
+{
+	FExecStatus ExecStatus = FExecStatus::OK();
+	UFusionCamSensor* FusionCamSensor = GetCamera(Args, ExecStatus);
+	if (!IsValid(FusionCamSensor)) return ExecStatus;
+
+	TArray<FColor> Data;
+	int Width, Height;
+	FusionCamSensor->GetLit(Data, Width, Height);
+	LychSim::SaveData(Data, Width, Height, Args, ExecStatus);
+	return ExecStatus;
+}
+
+FExecStatus FLychSimCameraHandler::GetCameraSeg(const TArray<FString>& Args)
+{
+	FExecStatus ExecStatus = FExecStatus::OK();
+	UFusionCamSensor* FusionCamSensor = GetCamera(Args, ExecStatus);
+	if (!IsValid(FusionCamSensor)) return ExecStatus;
+
+	TArray<FColor> Data;
+	int Width, Height;
+	FusionCamSensor->GetSeg(Data, Width, Height);
+
+	LychSim::SaveData(Data, Width, Height, Args, ExecStatus);
+	return ExecStatus;
 }
