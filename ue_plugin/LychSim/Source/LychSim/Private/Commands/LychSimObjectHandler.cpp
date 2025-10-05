@@ -37,6 +37,12 @@ void FLychSimObjectHandler::RegisterCommands()
 		"Get object oriented bounding box [center(3), extent(3), rotation_matrix(9)]."
 	);
 
+	CommandDispatcher->BindCommandUE(
+		"lych obj get_color",
+		FDispatcherDelegateUE::CreateRaw(this, &FLychSimObjectHandler::GetObjectAnnotationColor),
+		"Get object color [r, g, b, a]."
+	);
+
 	CommandDispatcher->BindCommand(
 		"lych obj add [str] [str] [str] [str] [str] [str] [str] [str]",
 		FDispatcherDelegate::CreateRaw(this, &FLychSimObjectHandler::AddObject),
@@ -196,6 +202,66 @@ FExecStatus FLychSimObjectHandler::GetObjectOBB(const TArray<FString>& Args)
 	Ar3 << Rotator;
 
 	return FExecStatus::OK(Ar1.ToString() + " " + Ar2.ToString() + " " + Ar3.ToString());
+}
+
+FExecStatus FLychSimObjectHandler::GetObjectAnnotationColor(
+	const TArray<FString>& Pos,
+    const TMap<FString,FString>& Kw,
+    const TSet<FString>& Flags)
+{
+	TArray<AActor*> ActorList;
+	if (Flags.Contains("all"))
+	{
+		UVisionBPLib::GetActorList(ActorList);
+	}
+	else
+	{
+		for (const FString& ActorId : Pos)
+		{
+			AActor* Actor = GetActorById(FUnrealcvServer::Get().GetWorld(), ActorId);
+			ActorList.Add(Actor);
+		}
+	}
+
+	FString Out;
+    TSharedRef< TJsonWriter<> > Writer = TJsonWriterFactory<>::Create(&Out);
+
+	Writer->WriteObjectStart();
+	Writer->WriteValue(TEXT("status"), TEXT("ok"));
+
+	Writer->WriteArrayStart(TEXT("outputs"));
+
+	for (AActor* Actor : ActorList)
+	{
+		Writer->WriteObjectStart();
+		Writer->WriteValue(TEXT("object_id"), *Actor->GetName());
+
+		if (!Actor)
+        {
+            Writer->WriteValue(TEXT("status"), TEXT("not_found"));
+        }
+		else
+		{
+			Writer->WriteValue(TEXT("status"), TEXT("ok"));
+
+			FColor AnnotationColor;
+			FActorController Controller(Actor);
+			Controller.GetAnnotationColor(AnnotationColor);
+
+			Writer->WriteArrayStart(TEXT("center"));
+        	Writer->WriteValue(AnnotationColor.R); Writer->WriteValue(AnnotationColor.G);
+			Writer->WriteValue(AnnotationColor.B); Writer->WriteValue(AnnotationColor.A);
+        	Writer->WriteArrayEnd();
+		}
+
+		Writer->WriteObjectEnd();
+	}
+
+	Writer->WriteArrayEnd();
+	Writer->WriteObjectEnd();
+	Writer->Close();
+
+	return FExecStatus::OK(MoveTemp(Out));
 }
 
 FExecStatus FLychSimObjectHandler::AddObject(const TArray<FString>& Args)
