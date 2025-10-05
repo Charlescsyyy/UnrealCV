@@ -19,7 +19,7 @@ void FConsoleHelper::VBp(const TArray<FString>& Args)
 		Cmd += Args[ArgIndex] + " ";
 	}
 	Cmd += Args[NumArgs-1];
-	
+
 	FExecStatus ExecStatus = CommandDispatcher->Exec(Cmd);
 	UE_LOG(LogUnrealCV, Warning, TEXT("vbp helper function, the real command is %s"), *Cmd);
 	// In the console mode, output should be writen to the output log.
@@ -69,8 +69,13 @@ FConsoleHelper::FConsoleHelper()
 		FConsoleCommandWithArgsDelegate::CreateRaw(this, &FConsoleHelper::Lych)
 	);
 	IConsoleObject* LychObjectCmd = IConsoleManager::Get().RegisterConsoleCommand(
-		TEXT("lych object"),
+		TEXT("lych obj"),
 		TEXT("LychSim API for object operations"),
+		FConsoleCommandWithArgsDelegate::CreateRaw(this, &FConsoleHelper::Lych)
+	);
+	IConsoleObject* LychCameraCmd = IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("lych cam"),
+		TEXT("LychSim API for camera operations"),
 		FConsoleCommandWithArgsDelegate::CreateRaw(this, &FConsoleHelper::Lych)
 	);
 }
@@ -200,11 +205,11 @@ void FConsoleHelper::Lych(const TArray<FString>& Args)
 		Cmd += Args[ArgIndex] + " ";
 	}
 	Cmd += Args[NumArgs - 1]; // Maybe a more elegant implementation for joining string
-	
+
 	// FUnrealcvServer::Get().InitWorld();
 	FExecStatus ExecStatus = CommandDispatcher->Exec(Cmd);
 	UE_LOG(LogUnrealCV, Warning, TEXT("lych helper function, the real command is %s"), *Cmd);
-	
+
 	// In the console mode, output should be writen to the output log.
 	UE_LOG(LogUnrealCV, Warning, TEXT("%s"), *ExecStatus.GetMessage());
 	GetConsole()->Log(ExecStatus.GetMessage());
