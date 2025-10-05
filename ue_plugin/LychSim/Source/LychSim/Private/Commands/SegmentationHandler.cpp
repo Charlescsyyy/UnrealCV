@@ -73,16 +73,16 @@ void FSegmentationHandler::ReannotateWorld(const FString& Mode)
         return;
     }
 
-    // 先清空再重标注
+    
     WorldController->ObjectAnnotator.ClearAnnotations(World);
 
     if (Mode == TEXT("object"))
     {
-        // 先按 Actor 级附加组件，再按组统一着色
+        
         WorldController->ObjectAnnotator.AnnotateWorld(World);
         WorldController->ObjectAnnotator.AnnotateGroupedActors(World);
     }
-    else // part（默认）：Actor 级颜色
+    else 
     {
         WorldController->ObjectAnnotator.AnnotateWorld(World);
     }

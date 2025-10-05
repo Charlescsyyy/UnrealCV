@@ -361,7 +361,7 @@ void FObjectAnnotator::AnnotateGroupedActors(UWorld* World)
 	    UE_LOG(LogUnrealCV, Log, TEXT("AnnotateGroupedActors: processed %d root groups"), RootColor.Num());
 	}
 
-/*** 新增：清理所有 AnnotationComponent（重标注前先调用）***/
+
 void FObjectAnnotator::ClearAnnotations(UWorld* World)
 {
 	    if (!IsValid(World)) return;
