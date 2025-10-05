@@ -8,40 +8,43 @@
 #include "EngineUtils.h"
 #include "Actor/LychSimBasicActor.h"
 
+#include "Serialization/JsonWriter.h"
+#include "Serialization/JsonSerializer.h"
+
 void FLychSimObjectHandler::RegisterCommands()
 {
 	CommandDispatcher->BindCommand(
-		"lych object list",
+		"lych obj list",
 		FDispatcherDelegate::CreateRaw(this, &FLychSimObjectHandler::ListObjects),
 		"Get a list of all objects."
 	);
 
-	CommandDispatcher->BindCommand(
-		"lych object get_loc [str]",
-		FDispatcherDelegate::CreateRaw(this, &FLychSimObjectHandler::GetObjectLocation),
+	CommandDispatcher->BindCommandUE(
+		"lych obj get_loc",
+		FDispatcherDelegateUE::CreateRaw(this, &FLychSimObjectHandler::GetObjectLocation),
 		"Get object location [x, y, z]."
 	);
 
 	CommandDispatcher->BindCommand(
-		"lych object get_aabb [str]",
+		"lych obj get_aabb [str]",
 		FDispatcherDelegate::CreateRaw(this, &FLychSimObjectHandler::GetObjectAABB),
 		"Get object axis-aligned bounding box [center(3), extent(3)]."
 	);
 
 	CommandDispatcher->BindCommand(
-		"lych object get_obb [str]",
+		"lych obj get_obb [str]",
 		FDispatcherDelegate::CreateRaw(this, &FLychSimObjectHandler::GetObjectOBB),
 		"Get object oriented bounding box [center(3), extent(3), rotation_matrix(9)]."
 	);
 
 	CommandDispatcher->BindCommand(
-		"lych object add [str] [str] [str] [str] [str] [str] [str] [str]",
+		"lych obj add [str] [str] [str] [str] [str] [str] [str] [str]",
 		FDispatcherDelegate::CreateRaw(this, &FLychSimObjectHandler::AddObject),
 		"Add object to the scene."
 	);
 
 	CommandDispatcher->BindCommand(
-		"lych object set_mtl [str] [str] [str]",
+		"lych obj set_mtl [str] [str] [str]",
 		FDispatcherDelegate::CreateRaw(this, &FLychSimObjectHandler::SetObjectMaterial),
 		"Set object material."
 	);
@@ -94,18 +97,62 @@ FExecStatus FLychSimObjectHandler::ListObjects(const TArray<FString>& Args)
 	return FExecStatus::OK(StrActorList);
 }
 
-FExecStatus FLychSimObjectHandler::GetObjectLocation(const TArray<FString>& Args)
+FExecStatus FLychSimObjectHandler::GetObjectLocation(
+	const TArray<FString>& Pos,
+    const TMap<FString,FString>& Kw,
+    const TSet<FString>& Flags)
 {
-	AActor* Actor = LychSimGetActor(Args);
-	if (!Actor) return FExecStatus::Error("Object not found");
+	TArray<AActor*> ActorList;
+	if (Flags.Contains("all"))
+	{
+		UVisionBPLib::GetActorList(ActorList);
+	}
+	else
+	{
+		for (const FString& ActorId : Pos)
+		{
+			AActor* Actor = GetActorById(FUnrealcvServer::Get().GetWorld(), ActorId);
+			ActorList.Add(Actor);
+		}
+	}
 
-	FActorController Controller(Actor);
-	FVector Location = Controller.GetLocation();
+	FString Out;
+    TSharedRef< TJsonWriter<> > Writer = TJsonWriterFactory<>::Create(&Out);
 
-	FStrFormatter Ar;
-	Ar << Location;
+	Writer->WriteObjectStart();
+	Writer->WriteValue(TEXT("status"), TEXT("ok"));
 
-	return FExecStatus::OK(Ar.ToString());
+	Writer->WriteArrayStart(TEXT("outputs"));
+
+	for (AActor* Actor : ActorList)
+	{
+		Writer->WriteObjectStart();
+		Writer->WriteValue(TEXT("object_id"), *Actor->GetName());
+
+		if (!Actor)
+        {
+            Writer->WriteValue(TEXT("status"), TEXT("not_found"));
+        }
+		else
+		{
+			Writer->WriteValue(TEXT("status"), TEXT("ok"));
+
+			FActorController Controller(Actor);
+			FVector Location = Controller.GetLocation();
+
+			Writer->WriteArrayStart(TEXT("center"));
+        	Writer->WriteValue(Location.X); Writer->WriteValue(Location.Y); Writer->WriteValue(Location.Z);
+        	Writer->WriteArrayEnd();
+		}
+
+		Writer->WriteObjectEnd();
+	}
+
+	Writer->WriteArrayEnd();
+	Writer->WriteObjectEnd();
+	Writer->Close();
+
+	return FExecStatus::OK(MoveTemp(Out));
 }
 
 FExecStatus FLychSimObjectHandler::GetObjectAABB(const TArray<FString>& Args)
@@ -221,7 +268,7 @@ FExecStatus FLychSimObjectHandler::SetObjectMaterial(const TArray<FString>& Args
 		ElementIdx = FCString::Atoi(*Args[2]);
 	}
 	else {
-		return FExecStatus::Error("Usage: lych object set_mtl [str] [str] [int]");
+		return FExecStatus::Error("Usage: lych obj set_mtl [str] [str] [int]");
 	}
 
 	AActor* Actor = LychSimGetActor(Args);
