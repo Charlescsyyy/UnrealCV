@@ -13,7 +13,7 @@ private:
 
 	FExecStatus GetObjectLocation(const TArray<FString>& Args);
 	FExecStatus GetObjectLocation(const TArray<FString>& Pos, const TMap<FString,FString>& Kw, const TSet<FString>& Flags);
-	FExecStatus GetObjectAABB(const TArray<FString>& Args);
+	FExecStatus GetObjectAABB(const TArray<FString>& Pos, const TMap<FString,FString>& Kw, const TSet<FString>& Flags);
 	FExecStatus GetObjectOBB(const TArray<FString>& Args);
 	FExecStatus GetObjectAnnotationColor(const TArray<FString>& Pos, const TMap<FString,FString>& Kw, const TSet<FString>& Flags);
 

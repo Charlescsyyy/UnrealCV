@@ -25,9 +25,9 @@ void FLychSimObjectHandler::RegisterCommands()
 		"Get object location [x, y, z]."
 	);
 
-	CommandDispatcher->BindCommand(
-		"lych obj get_aabb [str]",
-		FDispatcherDelegate::CreateRaw(this, &FLychSimObjectHandler::GetObjectAABB),
+	CommandDispatcher->BindCommandUE(
+		"lych obj get_aabb",
+		FDispatcherDelegateUE::CreateRaw(this, &FLychSimObjectHandler::GetObjectAABB),
 		"Get object axis-aligned bounding box [center(3), extent(3)]."
 	);
 
@@ -161,24 +161,70 @@ FExecStatus FLychSimObjectHandler::GetObjectLocation(
 	return FExecStatus::OK(MoveTemp(Out));
 }
 
-FExecStatus FLychSimObjectHandler::GetObjectAABB(const TArray<FString>& Args)
+FExecStatus FLychSimObjectHandler::GetObjectAABB(
+	const TArray<FString>& Pos,
+    const TMap<FString,FString>& Kw,
+    const TSet<FString>& Flags)
 {
-	AActor* Actor = LychSimGetActor(Args);
-	if (!Actor) return FExecStatus::Error("Object not found");
+	TArray<AActor*> ActorList;
+	if (Flags.Contains("all"))
+	{
+		UVisionBPLib::GetActorList(ActorList);
+	}
+	else
+	{
+		for (const FString& ActorId : Pos)
+		{
+			AActor* Actor = GetActorById(FUnrealcvServer::Get().GetWorld(), ActorId);
+			ActorList.Add(Actor);
+		}
+	}
 
-	FActorController Controller(Actor);
-	FBox AABB = Controller.GetAxisAlignedBoundingBox();
+	FString Out;
+    TSharedRef< TJsonWriter<> > Writer = TJsonWriterFactory<>::Create(&Out);
 
-	FVector Center = AABB.GetCenter();
-	FVector Extent = AABB.GetExtent();
+	Writer->WriteObjectStart();
+	Writer->WriteValue(TEXT("status"), TEXT("ok"));
 
-	FStrFormatter Ar1;
-	Ar1 << Center;
+	Writer->WriteArrayStart(TEXT("outputs"));
 
-	FStrFormatter Ar2;
-	Ar2 << Extent;
+	for (AActor* Actor : ActorList)
+	{
+		Writer->WriteObjectStart();
+		Writer->WriteValue(TEXT("object_id"), *Actor->GetName());
 
-	return FExecStatus::OK(Ar1.ToString() + " " + Ar2.ToString());
+		if (!Actor)
+        {
+            Writer->WriteValue(TEXT("status"), TEXT("not_found"));
+        }
+		else
+		{
+			Writer->WriteValue(TEXT("status"), TEXT("ok"));
+
+			FActorController Controller(Actor);
+			FBox AABB = Controller.GetAxisAlignedBoundingBox();
+
+			Writer->WriteArrayStart(TEXT("center"));
+        	Writer->WriteValue(AABB.GetCenter().X);
+        	Writer->WriteValue(AABB.GetCenter().Y);
+        	Writer->WriteValue(AABB.GetCenter().Z);
+        	Writer->WriteArrayEnd();
+
+			Writer->WriteArrayStart(TEXT("extent"));
+			Writer->WriteValue(AABB.GetExtent().X);
+			Writer->WriteValue(AABB.GetExtent().Y);
+			Writer->WriteValue(AABB.GetExtent().Z);
+			Writer->WriteArrayEnd();
+		}
+
+		Writer->WriteObjectEnd();
+	}
+
+	Writer->WriteArrayEnd();
+	Writer->WriteObjectEnd();
+	Writer->Close();
+
+	return FExecStatus::OK(MoveTemp(Out));
 }
 
 FExecStatus FLychSimObjectHandler::GetObjectOBB(const TArray<FString>& Args)
@@ -295,9 +341,18 @@ FExecStatus FLychSimObjectHandler::AddObject(const TArray<FString>& Args)
 	FVector Location(X, Y, Z);
 	FRotator Rotation(Pitch, Yaw, Roll);
 
-	UWorld* World = GetPIEWorld();
+	UWorld* World = nullptr;
+	if (GEditor->PlayWorld)
+	{
+		World = GEditor->PlayWorld;
+	}
+	else
+	{
+		World = GEditor->GetEditorWorldContext().World();
+	}
+
 	if (!World) {
-		return FExecStatus::Error("PIE world context not found");
+		return FExecStatus::Error("Valid world context not found");
 	}
 
 	if (ExistsActor(World, ObjectName))
