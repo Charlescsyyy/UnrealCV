@@ -21,7 +21,7 @@ void FLychSimObjectHandler::RegisterCommands()
 
 	CommandDispatcher->BindCommandUE(
 		"lych obj get_loc",
-		FDispatcherDelegateUE::CreateRaw(this, static_cast<FExecStatus (FLychSimObjectHandler::*)(const FCommandPositionalArgs&, const FCommandKwArgs&, const FCommandFlagSet&)>(&FLychSimObjectHandler::GetObjectLocation)),
+		FDispatcherDelegateUE::CreateRaw(this, &FLychSimObjectHandler::GetObjectLocation),
 		"Get object location [x, y, z]."
 	);
 
@@ -39,7 +39,7 @@ void FLychSimObjectHandler::RegisterCommands()
 
 	CommandDispatcher->BindCommandUE(
 		"lych obj get_color",
-		FDispatcherDelegateUE::CreateRaw(this, static_cast<FExecStatus (FLychSimObjectHandler::*)(const FCommandPositionalArgs&, const FCommandKwArgs&, const FCommandFlagSet&)>(&FLychSimObjectHandler::GetObjectAnnotationColor)),
+		FDispatcherDelegateUE::CreateRaw(this, &FLychSimObjectHandler::GetObjectAnnotationColor),
 		"Get object color [r, g, b, a]."
 	);
 
