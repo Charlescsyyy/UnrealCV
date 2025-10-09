@@ -17,6 +17,8 @@ private:
 	FExecStatus GetObjectOBB(const TArray<FString>& Args);
 	FExecStatus GetObjectAnnotationColor(const TArray<FString>& Pos, const TMap<FString,FString>& Kw, const TSet<FString>& Flags);
 
+	FExecStatus GetObjectIDFromSelection(const TArray<FString>& Args);
+
 	FExecStatus AddObject(const TArray<FString>& Args);
 
 	FExecStatus SetObjectMaterial(const TArray<FString>& Args);

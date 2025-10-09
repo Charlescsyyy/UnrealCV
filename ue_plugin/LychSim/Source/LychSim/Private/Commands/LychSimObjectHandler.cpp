@@ -11,6 +11,12 @@
 #include "Serialization/JsonWriter.h"
 #include "Serialization/JsonSerializer.h"
 
+#include "Editor.h"
+#include "Editor/UnrealEdEngine.h"
+#include "UnrealEdGlobals.h"
+#include "Selection.h"
+#include "GameFramework/Actor.h"
+
 void FLychSimObjectHandler::RegisterCommands()
 {
 	CommandDispatcher->BindCommand(
@@ -53,6 +59,12 @@ void FLychSimObjectHandler::RegisterCommands()
 		"lych obj set_mtl [str] [str] [str]",
 		FDispatcherDelegate::CreateRaw(this, &FLychSimObjectHandler::SetObjectMaterial),
 		"Set object material."
+	);
+
+	CommandDispatcher->BindCommand(
+		"lych obj list_selected",
+		FDispatcherDelegate::CreateRaw(this, &FLychSimObjectHandler::GetObjectIDFromSelection),
+		"Get the object ID from the current selection in the editor."
 	);
 }
 
@@ -404,4 +416,66 @@ FExecStatus FLychSimObjectHandler::SetObjectMaterial(const TArray<FString>& Args
 
 	MC->SetMaterial(ElementIdx, MI);
     return FExecStatus::OK("OK");
+}
+
+FExecStatus FLychSimObjectHandler::GetObjectIDFromSelection(const TArray<FString>& Args)
+{
+	FString Out;
+    TSharedRef< TJsonWriter<> > Writer = TJsonWriterFactory<>::Create(&Out);
+
+	Writer->WriteObjectStart();
+
+#if WITH_EDITOR
+	if (!GEditor)
+    {
+        Writer->WriteValue(TEXT("status"), TEXT("Editor not found"));
+		Writer->WriteObjectEnd();
+		Writer->Close();
+		return FExecStatus::OK(MoveTemp(Out));
+    }
+
+	USelection* SelectedActors = GEditor->GetSelectedActors();
+    if (!SelectedActors || SelectedActors->Num() == 0)
+    {
+        Writer->WriteValue(TEXT("status"), TEXT("No actor selected in editor"));
+		Writer->WriteObjectEnd();
+		Writer->Close();
+		return FExecStatus::OK(MoveTemp(Out));
+    }
+
+	Writer->WriteValue(TEXT("status"), TEXT("ok"));
+
+	Writer->WriteArrayStart(TEXT("outputs"));
+
+	for (FSelectionIterator It(*SelectedActors); It; ++It)
+    {
+        if (AActor* Actor = Cast<AActor>(*It))
+        {
+			Writer->WriteObjectStart();
+			Writer->WriteValue(TEXT("object_id"), *Actor->GetName());
+
+			FGuid Guid = Actor->GetActorGuid();
+			if (Guid.IsValid())
+			{
+				Writer->WriteValue(TEXT("guid"), *Guid.ToString());
+			}
+			else
+			{
+				Writer->WriteValue(TEXT("guid"), TEXT("NO_GUID"));
+			}
+			Writer->WriteObjectEnd();
+        }
+    }
+
+	Writer->WriteArrayEnd();
+	Writer->WriteObjectEnd();
+	Writer->Close();
+
+	return FExecStatus::OK(MoveTemp(Out));
+#else
+	Writer->WriteValue(TEXT("status"), TEXT("Running GetObjectIDFromSelection from a non-editor build"));
+	Writer->WriteObjectEnd();
+	Writer->Close();
+	return FExecStatus::OK(MoveTemp(Out));
+#endif
 }
