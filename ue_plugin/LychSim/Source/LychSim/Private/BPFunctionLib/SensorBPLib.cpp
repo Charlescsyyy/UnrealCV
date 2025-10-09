@@ -6,12 +6,57 @@
 #include "Runtime/CoreUObject/Public/UObject/UObjectHash.h"
 #include "Runtime/Launch/Resources/Version.h"
 
+#if WITH_EDITOR
+#include "Editor.h"
+#endif
+
+static UWorld* ResolveActiveWorld()
+{
+    if (UWorld* World = FUnrealcvServer::Get().GetWorld())
+    {
+        return World;
+    }
+
+    if (GEngine)
+    {
+        const TIndirectArray<FWorldContext>& Contexts = GEngine->GetWorldContexts();
+        for (const FWorldContext& Ctx : Contexts)
+        {
+            if (Ctx.World() && (Ctx.WorldType == EWorldType::Game || Ctx.WorldType == EWorldType::PIE))
+            {
+                return Ctx.World();
+            }
+        }
+    }
+
+#if WITH_EDITOR
+    if (GEditor)
+    {
+        if (const FWorldContext* PIECtx = GEditor->GetPIEWorldContext())
+        {
+            if (UWorld* PIEWorld = PIECtx->World())
+            {
+                return PIEWorld;
+            }
+        }
+
+        const FWorldContext& EditorCtx = GEditor->GetEditorWorldContext();
+        if (UWorld* EditorWorld = EditorCtx.World())
+        {
+            return EditorWorld;
+        }
+    }
+#endif
+
+    return GWorld;
+}
+
 TArray<UFusionCamSensor*> USensorBPLib::GetFusionSensorList()
 {
 	TArray<UFusionCamSensor*> SensorList;
 
-	UWorld* World = FUnrealcvServer::Get().GetWorld();
-	if (!World) return SensorList;
+	UWorld* World = ResolveActiveWorld();
+    if (!World) return SensorList;
 
 	APawn* Pawn = FUnrealcvServer::Get().GetPawn();
 
