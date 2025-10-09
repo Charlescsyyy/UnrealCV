@@ -7,7 +7,13 @@
 
 // DECLARE_DELEGATE(FCallbackDelegate);
 DECLARE_DELEGATE_OneParam(FCallbackDelegate, FExecStatus); // Callback needs to be set before Exec, accept ExecStatus
-DECLARE_DELEGATE_RetVal_OneParam(FExecStatus, FDispatcherDelegate, const TArray< FString >&);
+DECLARE_DELEGATE_RetVal_OneParam(FExecStatus, FDispatcherDelegate, const TArray<FString>&);
+
+using FCommandPositionalArgs = TArray<FString>;
+using FCommandKwArgs = TMap<FString, FString>;
+using FCommandFlagSet = TSet<FString>;
+
+DECLARE_DELEGATE_RetVal_ThreeParams(FExecStatus, FDispatcherDelegateUE, const FCommandPositionalArgs&, const FCommandKwArgs&, const FCommandFlagSet&);
 
 /**
  * Engine to execute commands
@@ -18,6 +24,7 @@ public:
 	FCommandDispatcher();
 	~FCommandDispatcher();
 	bool BindCommand(const FString& UriTemplate, const FDispatcherDelegate& Command, const FString& Description); // Parse URI
+	bool BindCommandUE(const FString& UriTemplate, const FDispatcherDelegateUE& Command, const FString& Description);
 	bool Alias(const FString& Alias, const FString& Command, const FString& Description);
 	bool Alias(const FString& Alias, const TArray<FString>& Commands, const FString& Description);
 
@@ -40,6 +47,10 @@ private:
 
 	/** Store help message */
 	TMap<FString, FString> UriDescription; // Contains help message
+
+	/** Advanced command bindings that parse positional, keyword and flag arguments */
+	TArray<FString> UriListUE;
+	TMap<FString, FDispatcherDelegateUE> UriMappingUE;
 
 	/** Store the definition of an alias */
 	TMap<FString, TArray<FString> > AliasMapping;

@@ -7,6 +7,7 @@
 #include "Runtime/Core/Public/Internationalization/Regex.h"
 #include "UnrealcvStats.h"
 #include "UnrealcvLog.h"
+#include "Utils/argparse.h"
 
 // CommandDispatcher->BindCommand("vset /mode/(?<ViewMode>.*)", SetViewMode); // Better to check the correctness at compile time
 // The regular expression for float number is from here, http://stackoverflow.com/questions/12643009/regular-expression-for-floating-point-numbers
@@ -129,6 +130,21 @@ bool FCommandDispatcher::BindCommand(const FString& ReadableUriTemplate, const F
 	return true;
 }
 
+bool FCommandDispatcher::BindCommandUE(const FString& ReadableUriTemplate, const FDispatcherDelegateUE& Command, const FString& Description)
+{
+	const FString Template = ReadableUriTemplate.TrimEnd();
+
+	if (UriMappingUE.Contains(Template))
+	{
+		UriMappingUE.Remove(Template);
+	}
+
+	UriMappingUE.Emplace(Template, Command);
+	UriDescription.Emplace(ReadableUriTemplate, Description);
+	UriListUE.AddUnique(Template);
+	return true;
+}
+
 bool FCommandDispatcher::Alias(const FString& InAlias, const TArray<FString>& Commands, const FString& Description)
 {
 	if (AliasMapping.Contains(InAlias))
@@ -228,6 +244,44 @@ FExecStatus FCommandDispatcher::Exec(const FString Uri)
 
 		// TODO: Regular expression mapping is slow, need to implement in a more efficient way.
 		// FRegexMatcher()
+	}
+
+	for (int UriIndex = UriListUE.Num() - 1; UriIndex >= 0; UriIndex--)
+	{
+		const FString& Template = UriListUE[UriIndex];
+		if (!Uri.StartsWith(Template))
+		{
+			continue;
+		}
+
+		const int32 TemplateLen = Template.Len();
+		if (Uri.Len() > TemplateLen)
+		{
+			const TCHAR NextChar = Uri[TemplateLen];
+			if (!FChar::IsWhitespace(NextChar))
+			{
+				continue;
+			}
+		}
+
+		const FString Tail = Uri.Mid(TemplateLen).TrimStart();
+		FDispatcherDelegateUE* Cmd = UriMappingUE.Find(Template);
+		if (!Cmd)
+		{
+			continue;
+		}
+
+		if (Cmd->IsBound())
+		{
+			const LychSim::FParsedCmd Parsed = LychSim::ParseTailWithFParse(Tail);
+			return Cmd->Execute(Parsed.Positionals, Parsed.Kwargs, Parsed.Flags);
+		}
+		else
+		{
+			FString ErrorMsg = TEXT("Command delegate is not bound.");
+			UE_LOG(LogUnrealCV, Warning, TEXT("%s"), *ErrorMsg);
+			return FExecStatus::Error(ErrorMsg);
+		}
 	}
 	return FExecStatus::Error(FString::Printf(TEXT("Can not find a handler for URI '%s'"), *Uri));
 }
