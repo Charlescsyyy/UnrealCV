@@ -18,7 +18,7 @@ FServerConfig::FServerConfig()
 	CoreSection = "UnrealCV.Core";
 
 	// Default value, will be unchanged if the config is missing.
-	Port = 9000; 
+	Port = 9000;
 	Width = 640;
 	Height = 480;
 	FOV = 90.0f;
@@ -36,7 +36,7 @@ FServerConfig::FServerConfig()
 	// SupportedModes.Add(TEXT("wireframe"));
 //	SupportedModes.Add(TEXT("default"));
 
-	this->Load(); 
+	this->Load();
 	this->Save(); // Flush the default config to the disk if file not exist.
 	this->ParseCmdArgs();
 
@@ -54,13 +54,13 @@ void FServerConfig::ParseCmdArgs()
 	// Use command line argument to overwrite config file.
 	int ArgPort;
 	// Use cvport to avoid conflict with UE4 default
-	if (FParse::Value(FCommandLine::Get(), TEXT("cvport"), ArgPort)) 
+	if (FParse::Value(FCommandLine::Get(), TEXT("cvport"), ArgPort))
 	{
 		Port = ArgPort;
 	}
 
 	FString LsFolder;
-	if (FParse::Value(FCommandLine::Get(), TEXT("cvls"), LsFolder)) 
+	if (FParse::Value(FCommandLine::Get(), TEXT("cvls"), LsFolder))
 	{
 		ListAsset(LsFolder);
 		FGenericPlatformMisc::RequestExit(false);
