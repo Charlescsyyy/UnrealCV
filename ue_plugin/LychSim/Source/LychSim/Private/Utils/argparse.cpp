@@ -40,7 +40,15 @@ namespace LychSim
 
         while (FParse::Token(Cmd, Tok, /*UseEscape*/ false))
         {
-            if (!Tok.StartsWith(TEXT("-")))
+			if (!Tok.StartsWith(TEXT("-")) || Tok.Len() < 2)
+			{
+                Out.Positionals.Add(MoveTemp(Tok));
+                continue;
+            }
+
+			// -.5 -0.5 -1
+			const TCHAR NextChar = Tok[1];
+            if (Tok.StartsWith(TEXT("-")) && (FChar::IsDigit(NextChar) || NextChar == TEXT('.')))
             {
                 Out.Positionals.Add(MoveTemp(Tok));
                 continue;
