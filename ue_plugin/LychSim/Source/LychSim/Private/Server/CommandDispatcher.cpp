@@ -7,6 +7,7 @@
 #include "Runtime/Core/Public/Internationalization/Regex.h"
 #include "UnrealcvStats.h"
 #include "UnrealcvLog.h"
+#include "Utils/argparse.h"
 
 // CommandDispatcher->BindCommand("vset /mode/(?<ViewMode>.*)", SetViewMode); // Better to check the correctness at compile time
 // The regular expression for float number is from here, http://stackoverflow.com/questions/12643009/regular-expression-for-floating-point-numbers
@@ -20,6 +21,9 @@ FCommandDispatcher::FCommandDispatcher()
 	TypeRegexp.Emplace("str", Str);
 	TypeRegexp.Emplace("uint", UInt);
 	TypeRegexp.Emplace("float", Float);
+
+	FString StrTail = "(\\S+(?:\\s+\\S+)*)";
+	TypeRegexp.Emplace("str+", StrTail);
 
 	FDispatcherDelegate Cmd = FDispatcherDelegate::CreateRaw(this, &FCommandDispatcher::AliasHelper);
 	FString Uri = FString::Printf(TEXT("vrun [str]"));
@@ -107,24 +111,35 @@ bool FCommandDispatcher::BindCommand(const FString& ReadableUriTemplate, const F
 	if (!FormatUri(ReadableUriTemplate, UriTemplate))
 	{
 		UE_LOG(LogUnrealCV, Error, TEXT("The UriTemplate %s is malformat"), *ReadableUriTemplate);
-		// check(false);
 		return false;
 	}
 
 	if (UriMapping.Contains(UriTemplate))
 	{
 		UE_LOG(LogUnrealCV, Warning, TEXT("The UriTemplate %s already exist, overwrited."), *UriTemplate);
+		return false;
 	}
 
-	if (UriMapping.Contains(UriTemplate))
-	{
-		// Remove existing uri and add, in order to overwrite existing commands
-		UriMapping.Remove(UriTemplate);
-	}
 	UriMapping.Emplace(UriTemplate, Command);
 	UriDescription.Emplace(ReadableUriTemplate, Description);
-	FRegexPattern Pattern = FRegexPattern(UriTemplate);
-	UriRegexPattern.Emplace(UriTemplate, Pattern);
+	UriRegexPattern.Emplace(UriTemplate, FRegexPattern(UriTemplate));
+	UriList.AddUnique(UriTemplate);
+	return true;
+}
+
+bool FCommandDispatcher::BindCommandUE(const FString& ReadableUriTemplate, const FDispatcherDelegateUE& Command, const FString& Description) // Parse URI
+{
+	FString UriTemplate = ReadableUriTemplate + TEXT(" (\\S+(?:\\s+\\S+)*)[ ]*$");
+
+	if (UriMappingUE.Contains(UriTemplate))
+	{
+		UE_LOG(LogUnrealCV, Warning, TEXT("The UriTemplate %s already exist, overwrited."), *UriTemplate);
+		return false;
+	}
+
+	UriMappingUE.Emplace(UriTemplate, Command);
+	UriDescription.Emplace(ReadableUriTemplate, Description);
+	UriRegexPattern.Emplace(UriTemplate, FRegexPattern(UriTemplate));
 	UriList.AddUnique(UriTemplate);
 	return true;
 }
@@ -178,8 +193,6 @@ const TMap<FString, FString>& FCommandDispatcher::GetUriDescription()
 	return this->UriDescription;
 }
 
-
-
 FExecStatus FCommandDispatcher::Exec(const FString Uri)
 {
 	SCOPE_CYCLE_COUNTER(STAT_Exec);
@@ -206,24 +219,28 @@ FExecStatus FCommandDispatcher::Exec(const FString Uri)
 		FRegexMatcher Matcher(Pattern, Uri);
 		if (Matcher.FindNext())
 		{
-			for (uint32 GroupIndex = 1; GroupIndex < NumArgsLimit + 1; GroupIndex++)
+			int32 TailStart = Matcher.GetCaptureGroupBeginning(1);
+			if (TailStart < 0) TailStart = Matcher.GetMatchEnding();
+
+			FString Tail = Uri.Mid(TailStart);
+			Tail.TrimStartAndEndInline();
+
+			LychSim::FParsedCmd P = LychSim::ParseTailWithFParse(Tail);
+
+			UE_LOG(LogUnrealCV, Warning, TEXT("Parsed command: %s"), *LychSim::ParsedCmdToString(P));
+
+			if (FDispatcherDelegateUE* CmdUE = UriMappingUE.Find(Key))
 			{
-				uint32 BeginIndex = Matcher.GetCaptureGroupBeginning(GroupIndex);
-				if (BeginIndex == -1) break; // No more matching group to extract
-				FString Match = Matcher.GetCaptureGroup(GroupIndex); // TODO: Strip empty space
-				Args.Add(Match);
+				if (CmdUE->IsBound())
+					return CmdUE->Execute(P.Positionals, P.Kwargs, P.Flags);
 			}
-			FDispatcherDelegate& Cmd = UriMapping[Key];
-			if (Cmd.IsBound())
-			{
-				return Cmd.Execute(Args); // The exec status can be successful, fail or give a message back
-			}
-			else
-			{
-				FString ErrorMsg = TEXT("Command delegate is not bound.");
-				UE_LOG(LogUnrealCV, Warning, TEXT("%s"), *ErrorMsg);
-				return FExecStatus::Error(ErrorMsg);
-			}
+
+			if (FDispatcherDelegate* Cmd = UriMapping.Find(Key))
+				if (Cmd->IsBound()) return Cmd->Execute(P.Positionals);
+
+			FString ErrorMsg = TEXT("Command delegate is not bound.");
+			UE_LOG(LogUnrealCV, Warning, TEXT("%s"), *ErrorMsg);
+			return FExecStatus::Error(ErrorMsg);
 		}
 
 		// TODO: Regular expression mapping is slow, need to implement in a more efficient way.
