@@ -49,6 +49,12 @@ void FLychSimObjectHandler::RegisterCommands()
 		"Get object color [r, g, b, a]."
 	);
 
+	CommandDispatcher->BindCommandUE(
+		"lych obj get_annots",
+		FDispatcherDelegateUE::CreateRaw(this, &FLychSimObjectHandler::GetObjectAnnotations),
+		"Get all object annotations."
+	);
+
 	CommandDispatcher->BindCommand(
 		"lych obj add [str] [str] [str] [str] [str] [str] [str] [str]",
 		FDispatcherDelegate::CreateRaw(this, &FLychSimObjectHandler::AddObject),
@@ -307,6 +313,132 @@ FExecStatus FLychSimObjectHandler::GetObjectAnnotationColor(
 			Controller.GetAnnotationColor(AnnotationColor);
 
 			Writer->WriteArrayStart(TEXT("center"));
+        	Writer->WriteValue(AnnotationColor.R); Writer->WriteValue(AnnotationColor.G);
+			Writer->WriteValue(AnnotationColor.B); Writer->WriteValue(AnnotationColor.A);
+        	Writer->WriteArrayEnd();
+		}
+
+		Writer->WriteObjectEnd();
+	}
+
+	Writer->WriteArrayEnd();
+	Writer->WriteObjectEnd();
+	Writer->Close();
+
+	return FExecStatus::OK(MoveTemp(Out));
+}
+
+FExecStatus FLychSimObjectHandler::GetObjectAnnotations(
+	const TArray<FString>& Pos,
+    const TMap<FString,FString>& Kw,
+    const TSet<FString>& Flags)
+{
+	TArray<AActor*> ActorList;
+	if (Flags.Contains("all"))
+	{
+		UVisionBPLib::GetActorList(ActorList);
+	}
+	else
+	{
+		for (const FString& ActorId : Pos)
+		{
+			AActor* Actor = GetActorById(FUnrealcvServer::Get().GetWorld(), ActorId);
+			ActorList.Add(Actor);
+		}
+	}
+
+	FString Out;
+    TSharedRef< TJsonWriter<> > Writer = TJsonWriterFactory<>::Create(&Out);
+
+	Writer->WriteObjectStart();
+	Writer->WriteValue(TEXT("status"), TEXT("ok"));
+
+	Writer->WriteArrayStart(TEXT("outputs"));
+
+	for (AActor* Actor : ActorList)
+	{
+		Writer->WriteObjectStart();
+		Writer->WriteValue(TEXT("object_id"), *Actor->GetName());
+
+		if (!Actor)
+        {
+            Writer->WriteValue(TEXT("status"), TEXT("not_found"));
+        }
+		else
+		{
+			Writer->WriteValue(TEXT("status"), TEXT("ok"));
+
+			FGuid Guid = Actor->GetActorGuid();
+			if (Guid.IsValid())
+			{
+				Writer->WriteValue(TEXT("guid"), *Guid.ToString());
+			}
+			else
+			{
+				Writer->WriteValue(TEXT("guid"), TEXT("NO_GUID"));
+			}
+
+			FActorController Controller(Actor);
+
+			FBox AABB = Controller.GetAxisAlignedBoundingBox();
+			Writer->WriteObjectStart(TEXT("aabb"));
+			Writer->WriteArrayStart(TEXT("center"));
+        	Writer->WriteValue(AABB.GetCenter().X);
+        	Writer->WriteValue(AABB.GetCenter().Y);
+        	Writer->WriteValue(AABB.GetCenter().Z);
+        	Writer->WriteArrayEnd();
+			Writer->WriteArrayStart(TEXT("extent"));
+			Writer->WriteValue(AABB.GetExtent().X);
+			Writer->WriteValue(AABB.GetExtent().Y);
+			Writer->WriteValue(AABB.GetExtent().Z);
+			Writer->WriteArrayEnd();
+			Writer->WriteObjectEnd();
+
+			FVector Center;
+			FVector Extent;
+			Actor->GetActorBounds(false, Center, Extent);
+			FRotator Rotator = Actor->GetActorRotation();
+			Writer->WriteObjectStart(TEXT("obb"));
+			Writer->WriteArrayStart(TEXT("center"));
+        	Writer->WriteValue(Center.X);
+        	Writer->WriteValue(Center.Y);
+        	Writer->WriteValue(Center.Z);
+        	Writer->WriteArrayEnd();
+			Writer->WriteArrayStart(TEXT("extent"));
+			Writer->WriteValue(Extent.X);
+			Writer->WriteValue(Extent.Y);
+			Writer->WriteValue(Extent.Z);
+			Writer->WriteArrayEnd();
+			Writer->WriteArrayStart(TEXT("rotation"));
+			Writer->WriteValue(Rotator.Pitch);
+			Writer->WriteValue(Rotator.Yaw);
+			Writer->WriteValue(Rotator.Roll);
+			Writer->WriteArrayEnd();
+			Writer->WriteObjectEnd();
+
+			bool bOnlyCollidingComponents = false;
+			Actor->GetActorBounds(bOnlyCollidingComponents, Center, Extent);
+			Writer->WriteObjectStart(TEXT("bounds"));
+			Writer->WriteArrayStart(TEXT("center"));
+			Writer->WriteValue(Center.X);
+			Writer->WriteValue(Center.Y);
+			Writer->WriteValue(Center.Z);
+			Writer->WriteArrayEnd();
+			Writer->WriteArrayStart(TEXT("extent"));
+			Writer->WriteValue(Extent.X);
+			Writer->WriteValue(Extent.Y);
+			Writer->WriteValue(Extent.Z);
+			Writer->WriteArrayEnd();
+			Writer->WriteObjectEnd();
+
+			FVector Location = Controller.GetLocation();
+			Writer->WriteArrayStart(TEXT("location"));
+			Writer->WriteValue(Location.X); Writer->WriteValue(Location.Y); Writer->WriteValue(Location.Z);
+			Writer->WriteArrayEnd();
+
+			FColor AnnotationColor;
+			Controller.GetAnnotationColor(AnnotationColor);
+			Writer->WriteArrayStart(TEXT("color"));
         	Writer->WriteValue(AnnotationColor.R); Writer->WriteValue(AnnotationColor.G);
 			Writer->WriteValue(AnnotationColor.B); Writer->WriteValue(AnnotationColor.A);
         	Writer->WriteArrayEnd();
