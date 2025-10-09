@@ -70,6 +70,12 @@ void FLychSimCameraHandler::RegisterCommands() {
 		FDispatcherDelegate::CreateRaw(this, &FLychSimCameraHandler::GetCameraDepth),
 		"Get png depth data from annotation sensor"
 	);
+
+	CommandDispatcher->BindCommand(
+		"lych cam get_annots [uint]",
+		FDispatcherDelegate::CreateRaw(this, &FLychSimCameraHandler::GetCameraAnnotations),
+		"Get png annotations data from annotation sensor"
+	);
 }
 
 UFusionCamSensor* FLychSimCameraHandler::GetCamera(const TArray<FString>& Args, FExecStatus& Status)
@@ -240,4 +246,64 @@ FExecStatus FLychSimCameraHandler::SetCameraFOV(const TArray<FString>& Args)
 	FusionCamSensor->SetSensorFOV(FOV);
 
 	return FExecStatus::OK();
+}
+
+FExecStatus FLychSimCameraHandler::GetCameraAnnotations(const TArray<FString>& Args)
+{
+	FString Out;
+    TSharedRef< TJsonWriter<> > Writer = TJsonWriterFactory<>::Create(&Out);
+	Writer->WriteObjectStart();
+
+	FExecStatus Status = FExecStatus::OK();
+	UFusionCamSensor* FusionCamSensor = GetCamera(Args, Status);
+	if (!IsValid(FusionCamSensor))
+	{
+		Writer->WriteValue(TEXT("status"), TEXT("invalid_camera"));
+		Writer->WriteObjectEnd();
+		Writer->Close();
+		return FExecStatus::OK(MoveTemp(Out));
+	}
+
+	Writer->WriteValue(TEXT("status"), TEXT("ok"));
+	Writer->WriteObjectStart(TEXT("outputs"));
+
+	FVector Location = FusionCamSensor->GetSensorLocation();
+	Writer->WriteArrayStart(TEXT("location"));
+	Writer->WriteValue(Location.X); Writer->WriteValue(Location.Y); Writer->WriteValue(Location.Z);
+	Writer->WriteArrayEnd();
+
+	FRotator Rotation = FusionCamSensor->GetSensorRotation();
+	Writer->WriteArrayStart(TEXT("rotation"));
+	Writer->WriteValue(Rotation.Pitch); Writer->WriteValue(Rotation.Yaw); Writer->WriteValue(Rotation.Roll);
+	Writer->WriteArrayEnd();
+
+	float FOV = FusionCamSensor->GetSensorFOV();
+	Writer->WriteValue(TEXT("fov"), FOV);
+
+	FTransform CameraTransform = FusionCamSensor->GetComponentTransform();
+	FMatrix C2W = CameraTransform.ToMatrixWithScale();
+	Writer->WriteArrayStart(TEXT("c2w"));
+	Writer->WriteArrayStart();
+	Writer->WriteValue(C2W.M[0][0]); Writer->WriteValue(C2W.M[0][1]); Writer->WriteValue(C2W.M[0][2]); Writer->WriteValue(C2W.M[0][3]);
+	Writer->WriteArrayEnd();
+	Writer->WriteArrayStart();
+	Writer->WriteValue(C2W.M[1][0]); Writer->WriteValue(C2W.M[1][1]); Writer->WriteValue(C2W.M[1][2]); Writer->WriteValue(C2W.M[1][3]);
+	Writer->WriteArrayEnd();
+	Writer->WriteArrayStart();
+	Writer->WriteValue(C2W.M[2][0]); Writer->WriteValue(C2W.M[2][1]); Writer->WriteValue(C2W.M[2][2]); Writer->WriteValue(C2W.M[2][3]);
+	Writer->WriteArrayEnd();
+	Writer->WriteArrayStart();
+	Writer->WriteValue(C2W.M[3][0]); Writer->WriteValue(C2W.M[3][1]); Writer->WriteValue(C2W.M[3][2]); Writer->WriteValue(C2W.M[3][3]);
+	Writer->WriteArrayEnd();
+	Writer->WriteArrayEnd();
+
+	int Width = FusionCamSensor->GetFilmWidth();
+	int Height = FusionCamSensor->GetFilmHeight();
+	Writer->WriteValue(TEXT("width"), Width);
+	Writer->WriteValue(TEXT("height"), Height);
+
+	Writer->WriteObjectEnd();
+	Writer->WriteObjectEnd();
+	Writer->Close();
+	return FExecStatus::OK(MoveTemp(Out));
 }
