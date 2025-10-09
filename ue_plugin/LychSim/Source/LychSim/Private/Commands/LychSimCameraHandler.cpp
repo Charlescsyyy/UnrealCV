@@ -6,6 +6,9 @@
 #include "Serialization.h"
 #include "Utils/DataUtil.h"
 #include "Utils/StrFormatter.h"
+#include "UnrealcvLog.h"
+#include "Editor.h"
+#include "ScopedTransaction.h"
 
 void FLychSimCameraHandler::RegisterCommands() {
     CommandDispatcher->BindCommand(
@@ -14,10 +17,22 @@ void FLychSimCameraHandler::RegisterCommands() {
 		"Get camera location in world space"
     );
 
+	CommandDispatcher->BindCommand(
+        "lych cam set_loc [uint] [float] [float] [float]",
+		FDispatcherDelegate::CreateRaw(this, &FLychSimCameraHandler::SetCameraLocation),
+		"Set camera location in world space"
+    );
+
     CommandDispatcher->BindCommand(
         "lych cam get_rot [uint]",
-		FDispatcherDelegate::CreateRaw(this, &FLychSimCameraHandler::GetCameraLocation),
+		FDispatcherDelegate::CreateRaw(this, &FLychSimCameraHandler::GetCameraRotation),
 		"Get camera location in world space"
+    );
+
+	CommandDispatcher->BindCommand(
+        "lych cam set_rot [uint] [float] [float] [float]",
+		FDispatcherDelegate::CreateRaw(this, &FLychSimCameraHandler::SetCameraRotation),
+		"Set camera rotation in world space"
     );
 
     CommandDispatcher->BindCommand(
@@ -155,4 +170,54 @@ FExecStatus FLychSimCameraHandler::GetCameraSeg(const TArray<FString>& Args)
 
 	LychSim::SaveData(Data, Width, Height, Args, ExecStatus);
 	return ExecStatus;
+}
+
+FExecStatus FLychSimCameraHandler::SetCameraLocation(const TArray<FString>& Args)
+{
+	FExecStatus Status = FExecStatus::OK();
+	UFusionCamSensor* FusionCamSensor = GetCamera(Args, Status);
+	if (!IsValid(FusionCamSensor))
+	{
+		UE_LOG(LogUnrealCV, Warning, TEXT("The camera is invalid when setting location."));
+		return FExecStatus::Error();
+	}
+
+	// Should I set the component loction or the actor location?
+	if (Args.Num() != 4) return FExecStatus::InvalidArgument; // ID, X, Y, Z
+
+	float X = FCString::Atof(*Args[1]), Y = FCString::Atof(*Args[2]), Z = FCString::Atof(*Args[3]);
+	FVector Location = FVector(X, Y, Z);
+
+	FusionCamSensor->SetSensorLocation(Location);
+
+	return FExecStatus::OK();
+}
+
+FExecStatus FLychSimCameraHandler::SetCameraRotation(const TArray<FString>& Args)
+{
+	FExecStatus Status = FExecStatus::OK();
+	UFusionCamSensor* FusionCamSensor = GetCamera(Args, Status);
+	if (!IsValid(FusionCamSensor)) return Status;
+
+	if (Args.Num() != 4) return FExecStatus::InvalidArgument; // ID, X, Y, Z
+	float Pitch = FCString::Atof(*Args[1]), Yaw = FCString::Atof(*Args[2]), Roll = FCString::Atof(*Args[3]);
+	FRotator Rotator = FRotator(Pitch, Yaw, Roll);
+
+	FusionCamSensor->SetSensorRotation(Rotator);
+
+	return FExecStatus::OK();
+}
+
+FExecStatus FLychSimCameraHandler::SetCameraFOV(const TArray<FString>& Args)
+{
+	FExecStatus Status = FExecStatus::OK();
+	UFusionCamSensor* FusionCamSensor = GetCamera(Args, Status);
+	if (!IsValid(FusionCamSensor)) return Status;
+
+	if (Args.Num() != 2) return FExecStatus::InvalidArgument; // ID, FOV
+
+	float FOV = FCString::Atof(*Args[1]);
+	FusionCamSensor->SetSensorFOV(FOV);
+
+	return FExecStatus::OK();
 }
