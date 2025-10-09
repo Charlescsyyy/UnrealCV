@@ -47,7 +47,7 @@ public:
 	/** OK : Message */
 	static FExecStatus OK(FString Message="");
 	/** Error : ErrorMessage */
-	static FExecStatus Error(FString ErrorMessage);
+	static FExecStatus Error(FString ErrorMessage="");
 	/** Error : Argument Invalid */
 	static FExecStatus InvalidArgument;
 	/** Error : Not implemented */
