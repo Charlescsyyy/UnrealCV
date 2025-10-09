@@ -2,12 +2,23 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Containers/Map.h"
+#include "Delegates/Delegate.h"
 #include "ExecStatus.h"
 #include "Runtime/Core/Public/Internationalization/Regex.h"
 
 // DECLARE_DELEGATE(FCallbackDelegate);
 DECLARE_DELEGATE_OneParam(FCallbackDelegate, FExecStatus); // Callback needs to be set before Exec, accept ExecStatus
 DECLARE_DELEGATE_RetVal_OneParam(FExecStatus, FDispatcherDelegate, const TArray< FString >&);
+
+using FStrArray = TArray<FString>;
+using FStrMap = TMap<FString, FString>;
+using FStrSet = TSet<FString>;
+DECLARE_DELEGATE_RetVal_ThreeParams(
+	FExecStatus, FDispatcherDelegateUE,
+	const FStrArray&,
+	const FStrMap&,
+	const FStrSet&);
 
 /**
  * Engine to execute commands
@@ -18,6 +29,7 @@ public:
 	FCommandDispatcher();
 	~FCommandDispatcher();
 	bool BindCommand(const FString& UriTemplate, const FDispatcherDelegate& Command, const FString& Description); // Parse URI
+	bool BindCommandUE(const FString& UriTemplate, const FDispatcherDelegateUE& Command, const FString& Description); // Parse URI with UE style
 	bool Alias(const FString& Alias, const FString& Command, const FString& Description);
 	bool Alias(const FString& Alias, const TArray<FString>& Commands, const FString& Description);
 
@@ -31,6 +43,7 @@ public:
 private:
 	/** Store which URI handler */
 	TMap<FString, FDispatcherDelegate> UriMapping;
+	TMap<FString, FDispatcherDelegateUE> UriMappingUE;
 
 	/** The complete list of binded URI, the order of adding is preserved */
 	TArray<FString> UriList;
@@ -47,7 +60,7 @@ private:
 	/** Store the regular expression for each type */
 	TMap<FString, FString> TypeRegexp; // Define regular expression for type
 
-	uint32 NumArgsLimit = 32;
+	int32 NumArgsLimit = 32;
 
 	/** Convert from a human readable URI to a regular expression */
 	bool FormatUri(const FString& RawUri, FString& UriRexexp);
