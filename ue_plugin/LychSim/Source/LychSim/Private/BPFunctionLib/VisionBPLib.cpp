@@ -55,6 +55,47 @@
 // 	return Data;
 // }
 
+static UWorld* ResolveActiveWorld()
+{
+    if (UWorld* World = FUnrealcvServer::Get().GetWorld())
+    {
+        return World;
+    }
+
+    if (GEngine)
+    {
+        const TIndirectArray<FWorldContext>& Contexts = GEngine->GetWorldContexts();
+        for (const FWorldContext& Ctx : Contexts)
+        {
+            if (Ctx.World() && (Ctx.WorldType == EWorldType::Game || Ctx.WorldType == EWorldType::PIE))
+            {
+                return Ctx.World();
+            }
+        }
+    }
+
+#if WITH_EDITOR
+    if (GEditor)
+    {
+        if (const FWorldContext* PIECtx = GEditor->GetPIEWorldContext())
+        {
+            if (UWorld* PIEWorld = PIECtx->World())
+            {
+                return PIEWorld;
+            }
+        }
+
+        const FWorldContext& EditorCtx = GEditor->GetEditorWorldContext();
+        if (UWorld* EditorWorld = EditorCtx.World())
+        {
+            return EditorWorld;
+        }
+    }
+#endif
+
+    return GWorld;
+}
+
 bool UVisionBPLib::CreateFile(const FString& Filename)
 {
 	if (FFileHelper::SaveStringToFile(TEXT(""), *Filename))
@@ -176,9 +217,9 @@ void UVisionBPLib::GetBoneTransformJson(
 {
 	TArray<FTransform> BoneTransforms;
 	GetBoneTransform(
-		SkeletalMeshComponent, 
-		IncludedBones, 
-		BoneNames, 
+		SkeletalMeshComponent,
+		IncludedBones,
+		BoneNames,
 		BoneTransforms,
 		bWorldSpace
 	);
@@ -235,7 +276,7 @@ void UVisionBPLib::GetActorList(TArray<AActor*>& ActorList)
 	for (UObject* ActorObject : UObjectList)
 	{
 		AActor* Actor = Cast<AActor>(ActorObject);
-		if (Actor->GetWorld() != FUnrealcvServer::Get().GetWorld()) continue;
+		if (Actor->GetWorld() != ResolveActiveWorld()) continue;
 		ActorList.AddUnique(Actor);
 	}
 }
