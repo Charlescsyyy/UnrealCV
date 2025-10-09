@@ -16,6 +16,7 @@
 #include "ImageUtil.h"
 #include "SensorBPLib.h"
 #include "FusionCameraActor.h"
+#include "Utils/DataUtil.h"
 
 #include "UnrealcvStats.h"
 #include "UnrealClient.h"
@@ -34,7 +35,7 @@ UFusionCamSensor* FCameraHandler::GetCamera(const TArray<FString>& Args, FExecSt
 	}
 	int SensorId = FCString::Atoi(*Args[0]);
 	UFusionCamSensor* FusionSensor = USensorBPLib::GetSensorById(SensorId);
-	if (!IsValid(FusionSensor)) 
+	if (!IsValid(FusionSensor))
 	{
 		FString Msg = TEXT("Invalid sensor id");
 		UE_LOG(LogTemp, Warning, TEXT("%s"), *Msg);
@@ -63,7 +64,7 @@ FExecStatus FCameraHandler::GetCameraLocation(const TArray<FString>& Args)
 {
 	FExecStatus Status = FExecStatus::OK();
 	UFusionCamSensor* FusionCamSensor = GetCamera(Args, Status);
-	if (!IsValid(FusionCamSensor)) return Status; 
+	if (!IsValid(FusionCamSensor)) return Status;
 
 	FStrFormatter Ar;
 	FVector Location = FusionCamSensor->GetSensorLocation();
@@ -76,7 +77,7 @@ FExecStatus FCameraHandler::SetCameraLocation(const TArray<FString>& Args)
 {
 	FExecStatus Status = FExecStatus::OK();
 	UFusionCamSensor* FusionCamSensor = GetCamera(Args, Status);
-	if (!IsValid(FusionCamSensor)) return Status; 
+	if (!IsValid(FusionCamSensor)) return Status;
 
 	// Should I set the component loction or the actor location?
 	if (Args.Num() != 4) return FExecStatus::InvalidArgument; // ID, X, Y, Z
@@ -111,7 +112,7 @@ FExecStatus FCameraHandler::GetCameraRotation(const TArray<FString>& Args)
 {
 	FExecStatus Status = FExecStatus::OK();
 	UFusionCamSensor* FusionCamSensor = GetCamera(Args, Status);
-	if (!IsValid(FusionCamSensor)) return Status; 
+	if (!IsValid(FusionCamSensor)) return Status;
 
 	FRotator Rotation = FusionCamSensor->GetSensorRotation();
 	FStrFormatter Ar;
@@ -124,7 +125,7 @@ FExecStatus FCameraHandler::SetCameraRotation(const TArray<FString>& Args)
 {
 	FExecStatus Status = FExecStatus::OK();
 	UFusionCamSensor* FusionCamSensor = GetCamera(Args, Status);
-	if (!IsValid(FusionCamSensor)) return Status; 
+	if (!IsValid(FusionCamSensor)) return Status;
 
 	if (Args.Num() != 4) return FExecStatus::InvalidArgument; // ID, X, Y, Z
 	float Pitch = FCString::Atof(*Args[1]), Yaw = FCString::Atof(*Args[2]), Roll = FCString::Atof(*Args[3]);
@@ -157,7 +158,7 @@ FExecStatus FCameraHandler::SetCameraRotation(const TArray<FString>& Args)
 
 
 // TODO: Move this to utility library
-EFilenameType FCameraHandler::ParseFilenameType(const FString& Filename)
+LychSim::EFilenameType FCameraHandler::ParseFilenameType(const FString& Filename)
 {
 	bool bIncludeDot = false;
 	FString FileExtension = FPaths::GetExtension(Filename);
@@ -169,39 +170,39 @@ EFilenameType FCameraHandler::ParseFilenameType(const FString& Filename)
 
 	if (FileExtension == Filename) // The filename only contains extension, which means the binary mode
 	{
-		if (FileExtension == TEXT("png")) return EFilenameType::PngBinary;
-		if (FileExtension == TEXT("bmp")) return EFilenameType::BmpBinary;
-		if (FileExtension == TEXT("npy")) return EFilenameType::NpyBinary;
+		if (FileExtension == TEXT("png")) return LychSim::EFilenameType::PngBinary;
+		if (FileExtension == TEXT("bmp")) return LychSim::EFilenameType::BmpBinary;
+		if (FileExtension == TEXT("npy")) return LychSim::EFilenameType::NpyBinary;
 	}
 	else
 	{
-		if (FileExtension == TEXT("png")) return EFilenameType::Png;
-		if (FileExtension == TEXT("bmp")) return EFilenameType::Bmp;
-		if (FileExtension == TEXT("npy")) return EFilenameType::Npy;
-		if (FileExtension == TEXT("exr")) return EFilenameType::Exr;
+		if (FileExtension == TEXT("png")) return LychSim::EFilenameType::Png;
+		if (FileExtension == TEXT("bmp")) return LychSim::EFilenameType::Bmp;
+		if (FileExtension == TEXT("npy")) return LychSim::EFilenameType::Npy;
+		if (FileExtension == TEXT("exr")) return LychSim::EFilenameType::Exr;
 	}
-	return EFilenameType::Invalid;
+	return LychSim::EFilenameType::Invalid;
 }
 
 /** Serialize data according to filename format */
 FExecStatus FCameraHandler::SerializeData(const TArray<FColor>& Data, int Width, int Height, const FString& Filename)
 {
 	static FImageUtil ImageUtil;
-	EFilenameType FilenameType = ParseFilenameType(Filename);
+	LychSim::EFilenameType FilenameType = ParseFilenameType(Filename);
 
 	TArray<uint8> BinaryData;
 	switch (FilenameType)
 	{
-	case EFilenameType::BmpBinary:
+	case LychSim::EFilenameType::BmpBinary:
 		ImageUtil.ConvertToBmp(Data, Width, Height, BinaryData);
 		return FExecStatus::Binary(BinaryData);
-	case EFilenameType::Bmp:
+	case LychSim::EFilenameType::Bmp:
 		ImageUtil.SaveBmpFile(Data, Width, Height, Filename);
 		return FExecStatus::OK(Filename);
-	case EFilenameType::PngBinary:
+	case LychSim::EFilenameType::PngBinary:
 		ImageUtil.ConvertToPng(Data, Width, Height, BinaryData);
 		return FExecStatus::Binary(BinaryData);
-	case EFilenameType::Png:
+	case LychSim::EFilenameType::Png:
 		ImageUtil.SavePngFile(Data, Width, Height, Filename);
 		return FExecStatus::OK(Filename);
 	}
@@ -211,16 +212,16 @@ FExecStatus FCameraHandler::SerializeData(const TArray<FColor>& Data, int Width,
 FExecStatus FCameraHandler::SerializeData(const TArray<FFloat16Color>& Data, int Width, int Height, const FString& Filename)
 {
 	static FImageUtil ImageUtil;
-	EFilenameType FilenameType = ParseFilenameType(Filename);
+	LychSim::EFilenameType FilenameType = ParseFilenameType(Filename);
 
 	TArray<uint8> BinaryData;
 	int Channel = Data.Num() / (Width * Height);
 	switch (FilenameType)
 	{
-	case EFilenameType::NpyBinary:
+	case LychSim::EFilenameType::NpyBinary:
 		BinaryData = FSerializationUtils::Array2Npy(Data, Width, Height, Channel);
 		return FExecStatus::Binary(BinaryData);
-	case EFilenameType::Npy:
+	case LychSim::EFilenameType::Npy:
 		BinaryData = FSerializationUtils::Array2Npy(Data, Width, Height, Channel);
 		ImageUtil.SaveFile(BinaryData, Filename);
 		return FExecStatus::OK(Filename);
@@ -231,16 +232,16 @@ FExecStatus FCameraHandler::SerializeData(const TArray<FFloat16Color>& Data, int
 FExecStatus FCameraHandler::SerializeData(const TArray<float>& Data, int Width, int Height, const FString& Filename)
 {
 	static FImageUtil ImageUtil;
-	EFilenameType FilenameType = ParseFilenameType(Filename);
+	LychSim::EFilenameType FilenameType = ParseFilenameType(Filename);
 
 	TArray<uint8> BinaryData;
 	int Channel = Data.Num() / (Width * Height);
 	switch (FilenameType)
 	{
-	case EFilenameType::NpyBinary:
+	case LychSim::EFilenameType::NpyBinary:
 		BinaryData = FSerializationUtils::Array2Npy(Data, Width, Height, Channel);
 		return FExecStatus::Binary(BinaryData);
-	case EFilenameType::Npy:
+	case LychSim::EFilenameType::Npy:
 		BinaryData = FSerializationUtils::Array2Npy(Data, Width, Height, Channel);
 		ImageUtil.SaveFile(BinaryData, Filename);
 		return FExecStatus::OK(Filename);
@@ -276,7 +277,7 @@ FExecStatus FCameraHandler::GetCameraLit(const TArray<FString>& Args)
 
 	FExecStatus ExecStatus = FExecStatus::OK();
 	UFusionCamSensor* FusionCamSensor = GetCamera(Args, ExecStatus);
-	if (!IsValid(FusionCamSensor)) return ExecStatus; 
+	if (!IsValid(FusionCamSensor)) return ExecStatus;
 
 	TArray<FColor> Data;
 	int Width, Height;
@@ -289,7 +290,7 @@ FExecStatus FCameraHandler::GetCameraDepth(const TArray<FString>& Args)
 {
 	FExecStatus ExecStatus = FExecStatus::OK();
 	UFusionCamSensor* FusionCamSensor = GetCamera(Args, ExecStatus);
-	if (!IsValid(FusionCamSensor)) return ExecStatus; 
+	if (!IsValid(FusionCamSensor)) return ExecStatus;
 
 	TArray<float> Data;
 	int Width, Height;
@@ -303,7 +304,7 @@ FExecStatus FCameraHandler::GetCameraNormal(const TArray<FString>& Args)
 {
 	FExecStatus ExecStatus = FExecStatus::OK();
 	UFusionCamSensor* FusionCamSensor = GetCamera(Args, ExecStatus);
-	if (!IsValid(FusionCamSensor)) return ExecStatus; 
+	if (!IsValid(FusionCamSensor)) return ExecStatus;
 
 	TArray<FColor> Data;
 	int Width, Height;
@@ -316,7 +317,7 @@ FExecStatus FCameraHandler::GetCameraObjMask(const TArray<FString>& Args)
 {
 	FExecStatus ExecStatus = FExecStatus::OK();
 	UFusionCamSensor* FusionCamSensor = GetCamera(Args, ExecStatus);
-	if (!IsValid(FusionCamSensor)) return ExecStatus; 
+	if (!IsValid(FusionCamSensor)) return ExecStatus;
 
 	TArray<FColor> Data;
 	int Width, Height;
@@ -330,7 +331,7 @@ FExecStatus FCameraHandler::MoveTo(const TArray<FString>& Args)
 {
 	// FExecStatus ExecStatus = FExecStatus::OK();
 	// UFusionCamSensor* FusionCamSensor = GetCamera(Args, ExecStatus);
-	// if (!IsValid(FusionCamSensor)) return ExecStatus; 
+	// if (!IsValid(FusionCamSensor)) return ExecStatus;
 
 	/** The API for Character, Pawn and Actor are different */
 	if (Args.Num() != 4) // ID, X, Y, Z

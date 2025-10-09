@@ -1,18 +1,7 @@
 #pragma once
 
 #include "CommandHandler.h"
-
-enum EFilenameType
-{
-	Png,
-	Npy,
-	Exr,
-	Bmp,
-	PngBinary,
-	NpyBinary,
-	BmpBinary,
-	Invalid, // Unrecognized filename type
-};
+#include "Utils/DataUtil.h"
 
 /** Handle vget/vset /camera/ commands */
 class FCameraHandler : public FCommandHandler
@@ -35,7 +24,7 @@ private:
 
 	FExecStatus SetCameraRotation(const TArray<FString>& Args);
 
-	EFilenameType ParseFilenameType(const FString& Filename);
+	LychSim::EFilenameType ParseFilenameType(const FString& Filename);
 
 	FExecStatus SerializeData(const TArray<FColor>& Data, int Width, int Height, const FString& Filename);
 
