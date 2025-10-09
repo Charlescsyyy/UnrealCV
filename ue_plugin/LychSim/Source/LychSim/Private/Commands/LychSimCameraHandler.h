@@ -23,4 +23,5 @@ private:
 
     FExecStatus GetCameraLit(const TArray<FString>& Args);
     FExecStatus GetCameraSeg(const TArray<FString>& Args);
+    FExecStatus GetCameraDepth(const TArray<FString>& Args);
 };
