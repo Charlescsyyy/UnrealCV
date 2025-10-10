@@ -60,6 +60,12 @@ void FLychSimCameraHandler::RegisterCommands() {
 	);
 
 	CommandDispatcher->BindCommand(
+		"lych cam warmup [uint]",
+		FDispatcherDelegate::CreateRaw(this, &FLychSimCameraHandler::WarmupCamera),
+		"Warm up the camera by capturing lit without saving data"
+	);
+
+	CommandDispatcher->BindCommand(
 		"lych cam get_seg [uint] [str]",
 		FDispatcherDelegate::CreateRaw(this, &FLychSimCameraHandler::GetCameraSeg),
 		"Get png segmentation data from annotation sensor"
@@ -167,6 +173,18 @@ FExecStatus FLychSimCameraHandler::GetCameraLit(const TArray<FString>& Args)
 	int Width, Height;
 	FusionCamSensor->GetLit(Data, Width, Height);
 	LychSim::SaveData(Data, Width, Height, Args, ExecStatus);
+	return ExecStatus;
+}
+
+FExecStatus FLychSimCameraHandler::WarmupCamera(const TArray<FString>& Args)
+{
+	FExecStatus ExecStatus = FExecStatus::OK();
+	UFusionCamSensor* FusionCamSensor = GetCamera(Args, ExecStatus);
+	if (!IsValid(FusionCamSensor)) return ExecStatus;
+
+	TArray<FColor> Data;
+	int Width, Height;
+	FusionCamSensor->GetLit(Data, Width, Height);
 	return ExecStatus;
 }
 
