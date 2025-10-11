@@ -19,8 +19,8 @@ FServerConfig::FServerConfig()
 
 	// Default value, will be unchanged if the config is missing.
 	Port = 9000;
-	Width = 640;
-	Height = 480;
+	Width = 1920;
+	Height = 1080;
 	FOV = 90.0f;
 	EnableInput = true;
 	ExitOnFailure = false;
