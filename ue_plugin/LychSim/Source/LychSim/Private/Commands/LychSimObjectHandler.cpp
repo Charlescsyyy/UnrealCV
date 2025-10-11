@@ -61,6 +61,12 @@ void FLychSimObjectHandler::RegisterCommands()
 		"Add object to the scene."
 	);
 
+	CommandDispatcher->BindCommandUE(
+		"lych obj get_mesh_extent",
+		FDispatcherDelegateUE::CreateRaw(this, &FLychSimObjectHandler::GetMeshExtent),
+		"Get object mesh extent [x, y, z]."
+	);
+
 	CommandDispatcher->BindCommand(
 		"lych obj del [str]",
 		FDispatcherDelegate::CreateRaw(this, &FLychSimObjectHandler::DestroyObject),
@@ -542,6 +548,64 @@ FExecStatus FLychSimObjectHandler::AddObject(const TArray<FString>& Args)
 	}
 
 	return FExecStatus::OK();
+}
+
+FExecStatus FLychSimObjectHandler::GetMeshExtent(
+	const TArray<FString>& Pos,
+    const TMap<FString,FString>& Kw,
+    const TSet<FString>& Flags)
+{
+	FString Out;
+    TSharedRef< TJsonWriter<> > Writer = TJsonWriterFactory<>::Create(&Out);
+
+	Writer->WriteObjectStart();
+	Writer->WriteValue(TEXT("status"), TEXT("ok"));
+
+	Writer->WriteArrayStart(TEXT("outputs"));
+
+	FVector Extent;
+	for (const FString& AssetPath : Pos)
+	{
+		Writer->WriteObjectStart();
+		Writer->WriteValue(TEXT("mesh_path"), *AssetPath);
+
+		if (UStaticMesh* SM = LoadObject<UStaticMesh>(nullptr, *AssetPath))
+		{
+			const FBoxSphereBounds B = SM->GetBounds();
+			Extent = B.BoxExtent;
+
+			Writer->WriteValue(TEXT("status"), TEXT("ok"));
+			Writer->WriteArrayStart(TEXT("extent"));
+			Writer->WriteValue(Extent.X);
+			Writer->WriteValue(Extent.Y);
+			Writer->WriteValue(Extent.Z);
+			Writer->WriteArrayEnd();
+		}
+		else if (USkeletalMesh* SK = LoadObject<USkeletalMesh>(nullptr, *AssetPath))
+		{
+			const FBoxSphereBounds B = SK->GetBounds();
+			Extent = B.BoxExtent;
+
+			Writer->WriteValue(TEXT("status"), TEXT("ok"));
+			Writer->WriteArrayStart(TEXT("extent"));
+			Writer->WriteValue(Extent.X);
+			Writer->WriteValue(Extent.Y);
+			Writer->WriteValue(Extent.Z);
+			Writer->WriteArrayEnd();
+		}
+		else
+		{
+			Writer->WriteValue(TEXT("status"), TEXT("not_found"));
+		}
+
+		Writer->WriteObjectEnd();
+	}
+
+	Writer->WriteArrayEnd();
+	Writer->WriteObjectEnd();
+	Writer->Close();
+
+	return FExecStatus::OK(MoveTemp(Out));
 }
 
 FExecStatus FLychSimObjectHandler::DestroyObject(const TArray<FString>& Args)

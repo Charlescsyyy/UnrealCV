@@ -21,6 +21,7 @@ private:
 	FExecStatus GetObjectIDFromSelection(const TArray<FString>& Args);
 
 	FExecStatus AddObject(const TArray<FString>& Args);
+	FExecStatus GetMeshExtent(const TArray<FString>& Pos, const TMap<FString,FString>& Kw, const TSet<FString>& Flags);
 	FExecStatus DestroyObject(const TArray<FString>& Args);
 
 	FExecStatus SetObjectMaterial(const TArray<FString>& Args);
