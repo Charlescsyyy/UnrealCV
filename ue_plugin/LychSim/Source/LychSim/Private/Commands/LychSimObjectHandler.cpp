@@ -524,6 +524,12 @@ FExecStatus FLychSimObjectHandler::AddObject(const TArray<FString>& Args)
 
 	NewActor->InitializeMesh(ObjectPath);
 
+	TWeakObjectPtr<AUnrealcvWorldController> WorldController = FUnrealcvServer::Get().WorldController;
+	if (WorldController.IsValid() && WorldController->IsAnnotationsReady())
+	{
+		WorldController->AnnotateNewObjects();
+	}
+
 	return FExecStatus::OK();
 }
 
