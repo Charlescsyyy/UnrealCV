@@ -18,7 +18,14 @@ classifiers=[
     "Programming Language :: Python :: 3"
 ]
 dependencies = [
-    "numpy",
+    "numpy==1.26.4",
+    "opencv-python",
+    "scipy",
+    "shapely",
+    "matplotlib",
+    "pycocotools",
+    "seaborn",
+    "tqdm",
     "black",
     "flake8"
 ]
