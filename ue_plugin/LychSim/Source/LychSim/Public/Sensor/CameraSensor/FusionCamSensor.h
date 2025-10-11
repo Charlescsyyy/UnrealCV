@@ -43,7 +43,7 @@ class LYCHSIM_API UFusionCamSensor : public UPrimitiveComponent
 public:
 	UFusionCamSensor(const FObjectInitializer& ObjectInitializer);
 
-	// virtual void OnRegister() override;
+	virtual void OnRegister() override;
 	virtual bool GetEditorPreviewInfo(float DeltaTime, FMinimalViewInfo& ViewOut);
 
 	/** Get rgb data */

@@ -66,24 +66,6 @@ void FSegmentationHandler::ReannotateWorld(const FString& Mode)
         return;
     }
 
-    UWorld* World = WorldController->GetWorld();
-    if (!World)
-    {
-        UE_LOG(LogUnrealCV, Warning, TEXT("World is invalid when setting segmentation mode"));
-        return;
-    }
-
-    
-    WorldController->ObjectAnnotator.ClearAnnotations(World);
-
-    if (Mode == TEXT("object"))
-    {
-        
-        WorldController->ObjectAnnotator.AnnotateWorld(World);
-        WorldController->ObjectAnnotator.AnnotateGroupedActors(World);
-    }
-    else 
-    {
-        WorldController->ObjectAnnotator.AnnotateWorld(World);
-    }
+    WorldController->SetSegmentationMode(Mode);
+    WorldController->RebuildAnnotations();
 }

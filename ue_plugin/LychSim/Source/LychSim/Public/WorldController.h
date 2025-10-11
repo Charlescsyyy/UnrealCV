@@ -33,4 +33,24 @@ public:
 	void AttachPawnSensor();
 
 	void Tick(float DeltaTime);
+
+	/** Ensure annotation components exist before segmentation requests */
+	void EnsureAnnotations();
+
+	/** Force rebuild of annotations based on current segmentation mode */
+	void RebuildAnnotations();
+
+	/** Update segmentation mode (part/object) used when generating annotations */
+	void SetSegmentationMode(const FString& Mode);
+
+	/** Mark annotations as dirty so they will be rebuilt on next request */
+	void MarkAnnotationsDirty();
+
+	FString GetSegmentationMode() const { return SegmentationMode; }
+
+private:
+	bool bAnnotationsReady;
+	FString SegmentationMode;
+
+	void ApplyAnnotations(UWorld* World);
 };

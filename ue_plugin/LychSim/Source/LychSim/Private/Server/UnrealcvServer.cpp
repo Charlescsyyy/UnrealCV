@@ -36,13 +36,37 @@ void FUnrealcvServer::Tick(float DeltaTime)
 
 void FUnrealcvServer::InitWorldController()
 {
-	UWorld* GameWorld = GetGameWorld();
-	if (IsValid(GameWorld) && !WorldController.IsValid())
+	UWorld* TargetWorld = GetGameWorld();
+	if (!IsValid(TargetWorld))
+	{
+		// Fall back to any active world (e.g. editor world) so we can support viewport-only workflows.
+		TargetWorld = GetWorld();
+	}
+
+	if (!IsValid(TargetWorld))
+	{
+		return;
+	}
+
+	if (WorldController.IsValid())
+	{
+		if (WorldController->GetWorld() != TargetWorld)
+		{
+			WorldController->Destroy();
+			WorldController = nullptr;
+		}
+	}
+
+	if (!WorldController.IsValid())
 	{
 		UE_LOG(LogTemp, Display, TEXT("FUnrealcvServer::Tick Create WorldController"));
-		this->WorldController = Cast<AUnrealcvWorldController>(GameWorld->SpawnActor(AUnrealcvWorldController::StaticClass()));
-		// if (IsValid(this->WorldController))
-		if (this->WorldController != nullptr)
+		FActorSpawnParameters SpawnParameters;
+		SpawnParameters.ObjectFlags |= RF_Transient;
+#if ENGINE_MAJOR_VERSION >= 5
+		SpawnParameters.bHideFromSceneOutliner = true;
+#endif
+		this->WorldController = TargetWorld->SpawnActor<AUnrealcvWorldController>(FVector::ZeroVector, FRotator::ZeroRotator, SpawnParameters);
+		if (WorldController.IsValid())
 		{
 			this->WorldController->InitWorld();
 		}

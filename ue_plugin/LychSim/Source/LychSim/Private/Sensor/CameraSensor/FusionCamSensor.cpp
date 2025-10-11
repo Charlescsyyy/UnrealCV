@@ -40,7 +40,7 @@ UFusionCamSensor::UFusionCamSensor(const FObjectInitializer& ObjectInitializer)
 	FServerConfig& Config = FUnrealcvServer::Get().Config;
 	FilmWidth = Config.Width == 0 ? 640 : Config.Width;
 	FilmHeight = Config.Height == 0 ? 480 : Config.Height;
-	FOV = Config.FOV == 0 ? 90 : Config.FOV; 
+	FOV = Config.FOV == 0 ? 90 : Config.FOV;
 	// Note: If FOV == 0, the render will give FMod assert error.
 	// Need to call update functions after copy operator (in BeginPlay), here just sets value
 
@@ -66,22 +66,35 @@ void UFusionCamSensor::BeginPlay()
 	SetSensorFOV(FOV);
 }
 
-// void UFusionCamSensor::OnRegister()
-// {
-// 	Super::OnRegister();
+void UFusionCamSensor::OnRegister()
+{
+	Super::OnRegister();
 
-// 	for (UBaseCameraSensor* Sensor : FusionSensors)
-// 	{
-// 		if (IsValid(Sensor))
-// 		{
-// 			Sensor->RegisterComponent();
-// 		}
-// 		else
-// 		{
-// 			UE_LOG(LogUnrealCV, Warning, TEXT("Invalid sensor is found in the OnRegister of FusionCamSensor"));
-// 		}
-// 	}
-// }
+	// Ensure capture targets exist even when BeginPlay never fires (e.g. editor viewport usage).
+	if (FilmWidth <= 0 || FilmHeight <= 0)
+	{
+		FServerConfig& Config = FUnrealcvServer::Get().Config;
+		FilmWidth = Config.Width == 0 ? 640 : Config.Width;
+		FilmHeight = Config.Height == 0 ? 480 : Config.Height;
+	}
+
+	if (FOV <= 0.f)
+	{
+		FServerConfig& Config = FUnrealcvServer::Get().Config;
+		FOV = Config.FOV == 0 ? 90.f : Config.FOV;
+	}
+
+	SetFilmSize(FilmWidth, FilmHeight);
+	SetSensorFOV(FOV);
+
+	for (UBaseCameraSensor* Sensor : FusionSensors)
+	{
+		if (IsValid(Sensor) && !Sensor->IsRegistered())
+		{
+			Sensor->RegisterComponent();
+		}
+	}
+}
 
 bool UFusionCamSensor::GetEditorPreviewInfo(float DeltaTime, FMinimalViewInfo& ViewOut)
 {
@@ -162,7 +175,7 @@ void UFusionCamSensor::SetFilmSize(int Width, int Height)
 
 float UFusionCamSensor::GetSensorFOV()
 {
-	return this->LitCamSensor->GetFOV(); 
+	return this->LitCamSensor->GetFOV();
 }
 
 void UFusionCamSensor::SetSensorFOV(float fov)

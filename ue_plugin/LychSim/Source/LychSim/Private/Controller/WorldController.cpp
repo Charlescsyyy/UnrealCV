@@ -15,12 +15,18 @@
 AUnrealcvWorldController::AUnrealcvWorldController(const FObjectInitializer& ObjectInitializer)
 {
 	PlayerViewMode = CreateDefaultSubobject<UPlayerViewMode>(TEXT("PlayerViewMode"));
+	SegmentationMode = TEXT("part");
+	bAnnotationsReady = false;
 }
 
 void AUnrealcvWorldController::AttachPawnSensor()
 {
 	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-	check(PlayerController);
+	if (!IsValid(PlayerController))
+	{
+		UE_LOG(LogUnrealCV, Warning, TEXT("AttachPawnSensor skipped: no PlayerController available in current world"));
+		return;
+	}
 	APawn* Pawn = PlayerController->GetPawn();
 	FUnrealcvServer& Server = FUnrealcvServer::Get();
 	if (!IsValid(Pawn))
@@ -50,16 +56,21 @@ void AUnrealcvWorldController::InitWorld()
 {
 	UE_LOG(LogUnrealCV, Display, TEXT("Overwrite the world setting with some UnrealCV extensions"));
 	FUnrealcvServer& UnrealcvServer = FUnrealcvServer::Get();
+	MarkAnnotationsDirty();
 	if (UnrealcvServer.TcpServer && !UnrealcvServer.TcpServer->IsListening())
 	{
 		UE_LOG(LogUnrealCV, Warning, TEXT("The tcp server is not running"));
 	}
 
-
-	ObjectAnnotator.AnnotateWorld(GetWorld());
-
-	FEngineShowFlags ShowFlags = GetWorld()->GetGameViewport()->EngineShowFlags;
-	this->PlayerViewMode->SaveGameDefault(ShowFlags);
+	if (UGameViewportClient* Viewport = GetWorld()->GetGameViewport())
+	{
+		FEngineShowFlags ShowFlags = Viewport->EngineShowFlags;
+		this->PlayerViewMode->SaveGameDefault(ShowFlags);
+	}
+	else
+	{
+		UE_LOG(LogUnrealCV, Warning, TEXT("GameViewport is not available when initializing world (likely editor world)"));
+	}
 
 	this->AttachPawnSensor();
 
@@ -99,4 +110,58 @@ void AUnrealcvWorldController::OpenLevel(FName LevelName)
 void AUnrealcvWorldController::Tick(float DeltaTime)
 {
 
+}
+
+void AUnrealcvWorldController::EnsureAnnotations()
+{
+	UWorld* World = GetWorld();
+	if (!IsValid(World))
+	{
+		return;
+	}
+
+	if (bAnnotationsReady)
+	{
+		return;
+	}
+
+	ApplyAnnotations(World);
+}
+
+void AUnrealcvWorldController::RebuildAnnotations()
+{
+	UWorld* World = GetWorld();
+	if (!IsValid(World))
+	{
+		return;
+	}
+
+	ObjectAnnotator.ClearAnnotations(World);
+	bAnnotationsReady = false;
+	ApplyAnnotations(World);
+}
+
+void AUnrealcvWorldController::SetSegmentationMode(const FString& Mode)
+{
+	SegmentationMode = Mode;
+}
+
+void AUnrealcvWorldController::MarkAnnotationsDirty()
+{
+	bAnnotationsReady = false;
+}
+
+void AUnrealcvWorldController::ApplyAnnotations(UWorld* World)
+{
+	if (!IsValid(World))
+	{
+		return;
+	}
+
+	ObjectAnnotator.AnnotateWorld(World);
+	if (SegmentationMode.Equals(TEXT("object"), ESearchCase::IgnoreCase))
+	{
+		ObjectAnnotator.AnnotateGroupedActors(World);
+	}
+	bAnnotationsReady = true;
 }

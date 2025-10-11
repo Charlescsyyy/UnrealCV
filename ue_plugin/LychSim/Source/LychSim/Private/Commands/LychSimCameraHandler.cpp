@@ -72,6 +72,12 @@ void FLychSimCameraHandler::RegisterCommands() {
 	);
 
 	CommandDispatcher->BindCommand(
+		"lych cam rebuild_annot",
+		FDispatcherDelegate::CreateRaw(this, &FLychSimCameraHandler::RebuildAnnotations),
+		"Rebuild the annotations for the camera"
+	);
+
+	CommandDispatcher->BindCommand(
 		"lych cam get_depth [uint] [str]",
 		FDispatcherDelegate::CreateRaw(this, &FLychSimCameraHandler::GetCameraDepth),
 		"Get png depth data from annotation sensor"
@@ -194,12 +200,32 @@ FExecStatus FLychSimCameraHandler::GetCameraSeg(const TArray<FString>& Args)
 	UFusionCamSensor* FusionCamSensor = GetCamera(Args, ExecStatus);
 	if (!IsValid(FusionCamSensor)) return ExecStatus;
 
+	TWeakObjectPtr<AUnrealcvWorldController> WorldController = FUnrealcvServer::Get().WorldController;
+	if (WorldController.IsValid())
+	{
+		WorldController->EnsureAnnotations();
+	}
+
 	TArray<FColor> Data;
 	int Width, Height;
 	FusionCamSensor->GetSeg(Data, Width, Height);
 
 	LychSim::SaveData(Data, Width, Height, Args, ExecStatus);
 	return ExecStatus;
+}
+
+FExecStatus FLychSimCameraHandler::RebuildAnnotations(const TArray<FString>& Args)
+{
+	TWeakObjectPtr<AUnrealcvWorldController> WorldController = FUnrealcvServer::Get().WorldController;
+	if (WorldController.IsValid())
+	{
+		WorldController->RebuildAnnotations();
+		return FExecStatus::OK();
+	}
+	else
+	{
+		return FExecStatus::Error(TEXT("WorldController is not valid"));
+	}
 }
 
 FExecStatus FLychSimCameraHandler::GetCameraDepth(const TArray<FString>& Args)
