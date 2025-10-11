@@ -18,7 +18,14 @@ class CameraCommandsMixin:
 
     def get_cam_seg(self, cam_id: int) -> Image.Image:
         res = self.client.request(f"lych cam get_seg {cam_id} png")
+        res = self.client.request(f"lych cam get_seg {cam_id} png")
         return Image.open(io.BytesIO(res))
+
+    def get_cam_normal(self, cam_id: int) -> Image.Image:
+        res = self.client.request(f"lych cam get_normal {cam_id} png")
+        res = self.client.request(f"lych cam get_normal {cam_id} png")
+        normal = np.array(Image.open(io.BytesIO(res)))[:, :, :3]
+        return Image.fromarray(normal)
 
     def get_cam_depth(self, cam_id: int) -> np.ndarray:
         res = self.client.request(f"lych cam get_depth {cam_id} npy")
@@ -101,5 +108,7 @@ class CameraCommandsMixin:
 
     def get_cam_annots(self, cam_id: int) -> dict:
         res = self.client.request(f"lych cam get_annots {cam_id}")
-        print(res)
         return json.loads(res)
+
+    def rebuild_cam_annots(self) -> None:
+        self.client.request("lych cam rebuild_annot")
