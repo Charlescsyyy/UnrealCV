@@ -41,6 +41,42 @@ void FObjectAnnotator::AnnotateWorld(UWorld* World)
 	UE_LOG(LogUnrealCV, Log, TEXT("Annotate mesh of the scene (%d)"), AnnotationColors.Num());
 }
 
+void FObjectAnnotator::AnnotateNewObjects(UWorld* World)
+{
+	if (!IsValid(World))
+	{
+		UE_LOG(LogUnrealCV, Warning, TEXT("Can not annotate world, the world is not valid"));
+		return;
+	}
+
+	TArray<AActor*> ActorArray;
+	GetAnnotableActors(World, ActorArray);
+
+	uint32 Count = 0;
+	for (AActor* Actor : ActorArray)
+	{
+		if (AnnotationColors.Contains(Actor->GetName()))
+		{
+			// Already annotated
+			continue;
+		}
+		else
+		{
+			Count++;
+
+			FColor AnnotationColor = GetDefaultColor(Actor);
+
+			if (!IsValid(Actor))
+			{
+				UE_LOG(LogUnrealCV, Warning, TEXT("Found invalid actor in AnnotateWorld"));
+				continue;
+			}
+			// Use VertexColor as annotation
+			this->SetAnnotationColor(Actor, AnnotationColor);
+		}
+	}
+	UE_LOG(LogUnrealCV, Log, TEXT("Annotate new mesh of the scene (%d)"), Count);
+}
 
 void FObjectAnnotator::SetAnnotationColor(AActor* Actor, const FColor& AnnotationColor)
 {
@@ -334,32 +370,32 @@ FColor FColorGenerator::GetColorFromColorMap(int32 ObjectIndex)
 //Added for part segmentation, colored grouped actors with the same color
 void FObjectAnnotator::AnnotateGroupedActors(UWorld* World)
 {
-	    if (!IsValid(World)) return;
-	    TMap<AActor*, FColor> RootColor;
-	    for (TActorIterator<AActor> It(World); It; ++It)
-		    {
-			        AActor* Actor = *It;
-			        if (!IsValid(Actor)) continue;
-			        // 寻找最顶层的 attachment root
-			        AActor* Root = Actor;
-			        while (Root->GetAttachParentActor())
-				            Root = Root->GetAttachParentActor();
-			        FColor* Existing = RootColor.Find(Root);
-			        FColor Col;
-			        if (Existing)
-				        {
-					            Col = *Existing;
-					        }
-			        else
-				        {
-					            Col = GetDefaultColor(Root);
-					            RootColor.Add(Root, Col);
-					        }
-			        SetAnnotationColor(Actor, Col);
-			        AnnotationColors.Emplace(Actor->GetName(), Col);
-			    }
-	    UE_LOG(LogUnrealCV, Log, TEXT("AnnotateGroupedActors: processed %d root groups"), RootColor.Num());
+    if (!IsValid(World)) return;
+    TMap<AActor*, FColor> RootColor;
+    for (TActorIterator<AActor> It(World); It; ++It)
+	{
+	    AActor* Actor = *It;
+	    if (!IsValid(Actor)) continue;
+	    // find top-level attachment root
+	    AActor* Root = Actor;
+	    while (Root->GetAttachParentActor())
+		    Root = Root->GetAttachParentActor();
+	    FColor* Existing = RootColor.Find(Root);
+	    FColor Col;
+	    if (Existing)
+		{
+	        Col = *Existing;
+	    }
+	    else
+		{
+		    Col = GetDefaultColor(Root);
+		    RootColor.Add(Root, Col);
+	    }
+	    SetAnnotationColor(Actor, Col);
+	    AnnotationColors.Emplace(Actor->GetName(), Col);
 	}
+	UE_LOG(LogUnrealCV, Log, TEXT("AnnotateGroupedActors: processed %d root groups"), RootColor.Num());
+}
 
 
 void FObjectAnnotator::ClearAnnotations(UWorld* World)

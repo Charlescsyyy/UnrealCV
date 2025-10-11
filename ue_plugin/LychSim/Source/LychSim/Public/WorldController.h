@@ -40,6 +40,9 @@ public:
 	/** Force rebuild of annotations based on current segmentation mode */
 	void RebuildAnnotations();
 
+	bool IsAnnotationsReady();
+	void AnnotateNewObjects();
+
 	/** Update segmentation mode (part/object) used when generating annotations */
 	void SetSegmentationMode(const FString& Mode);
 

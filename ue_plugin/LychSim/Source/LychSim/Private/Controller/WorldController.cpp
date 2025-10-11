@@ -141,6 +141,30 @@ void AUnrealcvWorldController::RebuildAnnotations()
 	ApplyAnnotations(World);
 }
 
+bool AUnrealcvWorldController::IsAnnotationsReady()
+{
+	return bAnnotationsReady;
+}
+
+void AUnrealcvWorldController::AnnotateNewObjects()
+{
+	UWorld* World = GetWorld();
+	if (!IsValid(World))
+	{
+		return;
+	}
+
+	if (!bAnnotationsReady)
+	{
+		ApplyAnnotations(World);
+		return;
+	}
+	else
+	{
+		ObjectAnnotator.AnnotateNewObjects(World);
+	}
+}
+
 void AUnrealcvWorldController::SetSegmentationMode(const FString& Mode)
 {
 	SegmentationMode = Mode;

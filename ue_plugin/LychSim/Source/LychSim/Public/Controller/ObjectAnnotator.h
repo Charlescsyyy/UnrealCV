@@ -29,6 +29,8 @@ public:
 	// Annotate all StaticMesh actor in the world
 	void AnnotateWorld(UWorld* World);
 
+	void AnnotateNewObjects(UWorld* World);
+
 	/** Annotate all MeshComponents in the world */
 	// void AnnotateMeshComponents(UWorld* World);
 
