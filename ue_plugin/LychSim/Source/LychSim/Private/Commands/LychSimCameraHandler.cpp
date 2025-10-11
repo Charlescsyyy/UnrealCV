@@ -80,7 +80,13 @@ void FLychSimCameraHandler::RegisterCommands() {
 	CommandDispatcher->BindCommand(
 		"lych cam get_depth [uint] [str]",
 		FDispatcherDelegate::CreateRaw(this, &FLychSimCameraHandler::GetCameraDepth),
-		"Get png depth data from annotation sensor"
+		"Get depth data from annotation sensor"
+	);
+
+	CommandDispatcher->BindCommand(
+		"lych cam get_normal [uint] [str]",
+		FDispatcherDelegate::CreateRaw(this, &FLychSimCameraHandler::GetCameraNormal),
+		"Get normal data from annotation sensor"
 	);
 
 	CommandDispatcher->BindCommand(
@@ -238,6 +244,19 @@ FExecStatus FLychSimCameraHandler::GetCameraDepth(const TArray<FString>& Args)
 	int Width, Height;
 	FusionCamSensor->GetDepth(Data, Width, Height);
 
+	LychSim::SaveData(Data, Width, Height, Args, ExecStatus);
+	return ExecStatus;
+}
+
+FExecStatus FLychSimCameraHandler::GetCameraNormal(const TArray<FString>& Args)
+{
+	FExecStatus ExecStatus = FExecStatus::OK();
+	UFusionCamSensor* FusionCamSensor = GetCamera(Args, ExecStatus);
+	if (!IsValid(FusionCamSensor)) return ExecStatus;
+
+	TArray<FColor> Data;
+	int Width, Height;
+	FusionCamSensor->GetNormal(Data, Width, Height);
 	LychSim::SaveData(Data, Width, Height, Args, ExecStatus);
 	return ExecStatus;
 }

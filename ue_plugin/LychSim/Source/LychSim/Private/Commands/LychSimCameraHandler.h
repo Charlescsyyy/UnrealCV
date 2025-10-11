@@ -24,6 +24,7 @@ private:
     FExecStatus GetCameraLit(const TArray<FString>& Args);
     FExecStatus WarmupCamera(const TArray<FString>& Args);
     FExecStatus GetCameraSeg(const TArray<FString>& Args);
+    FExecStatus GetCameraNormal(const TArray<FString>& Args);
     FExecStatus RebuildAnnotations(const TArray<FString>& Args);
     FExecStatus GetCameraDepth(const TArray<FString>& Args);
     FExecStatus GetCameraAnnotations(const TArray<FString>& Args);
