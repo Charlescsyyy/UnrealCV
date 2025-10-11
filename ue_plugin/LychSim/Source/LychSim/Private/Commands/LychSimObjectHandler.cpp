@@ -62,6 +62,12 @@ void FLychSimObjectHandler::RegisterCommands()
 	);
 
 	CommandDispatcher->BindCommand(
+		"lych obj del [str]",
+		FDispatcherDelegate::CreateRaw(this, &FLychSimObjectHandler::DestroyObject),
+		"Destroy object from the scene."
+	);
+
+	CommandDispatcher->BindCommand(
 		"lych obj set_mtl [str] [str] [str]",
 		FDispatcherDelegate::CreateRaw(this, &FLychSimObjectHandler::SetObjectMaterial),
 		"Set object material."
@@ -535,6 +541,15 @@ FExecStatus FLychSimObjectHandler::AddObject(const TArray<FString>& Args)
 		WorldController->AnnotateNewObjects();
 	}
 
+	return FExecStatus::OK();
+}
+
+FExecStatus FLychSimObjectHandler::DestroyObject(const TArray<FString>& Args)
+{
+	AActor* Actor = LychSimGetActor(Args);
+	if (!Actor) return FExecStatus::Error("Can not find object");
+
+	Actor->Destroy();
 	return FExecStatus::OK();
 }
 
