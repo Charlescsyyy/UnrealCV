@@ -78,6 +78,12 @@ void FLychSimCameraHandler::RegisterCommands() {
 	);
 
 	CommandDispatcher->BindCommand(
+		"lych cam clear_annot_comps",
+		FDispatcherDelegate::CreateRaw(this, &FLychSimCameraHandler::ClearAnnotationComponents),
+		"Clear all annotation components"
+	);
+
+	CommandDispatcher->BindCommand(
 		"lych cam get_depth [uint] [str]",
 		FDispatcherDelegate::CreateRaw(this, &FLychSimCameraHandler::GetCameraDepth),
 		"Get depth data from annotation sensor"
@@ -226,6 +232,20 @@ FExecStatus FLychSimCameraHandler::AnnotateNewObjects(const TArray<FString>& Arg
 	if (WorldController.IsValid())
 	{
 		WorldController->AnnotateNewObjects();
+		return FExecStatus::OK();
+	}
+	else
+	{
+		return FExecStatus::Error(TEXT("WorldController is not valid"));
+	}
+}
+
+FExecStatus FLychSimCameraHandler::ClearAnnotationComponents(const TArray<FString>& Args)
+{
+	TWeakObjectPtr<AUnrealcvWorldController> WorldController = FUnrealcvServer::Get().WorldController;
+	if (WorldController.IsValid())
+	{
+		WorldController->ClearAnnotations();
 		return FExecStatus::OK();
 	}
 	else

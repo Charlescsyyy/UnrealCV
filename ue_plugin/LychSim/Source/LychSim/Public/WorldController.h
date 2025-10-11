@@ -40,6 +40,8 @@ public:
 	/** Force rebuild of annotations based on current segmentation mode */
 	void RebuildAnnotations();
 
+	void ClearAnnotations();
+
 	bool IsAnnotationsReady();
 	void AnnotateNewObjects();
 

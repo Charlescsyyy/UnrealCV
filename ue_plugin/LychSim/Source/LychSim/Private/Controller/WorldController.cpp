@@ -141,6 +141,18 @@ void AUnrealcvWorldController::RebuildAnnotations()
 	ApplyAnnotations(World);
 }
 
+void AUnrealcvWorldController::ClearAnnotations()
+{
+	UWorld* World = GetWorld();
+	if (!IsValid(World))
+	{
+		return;
+	}
+
+	ObjectAnnotator.ClearAnnotations(World);
+	bAnnotationsReady = false;
+}
+
 bool AUnrealcvWorldController::IsAnnotationsReady()
 {
 	return bAnnotationsReady;

@@ -26,6 +26,7 @@ private:
     FExecStatus GetCameraSeg(const TArray<FString>& Args);
     FExecStatus GetCameraNormal(const TArray<FString>& Args);
     FExecStatus AnnotateNewObjects(const TArray<FString>& Args);
+    FExecStatus ClearAnnotationComponents(const TArray<FString>& Args);
     FExecStatus GetCameraDepth(const TArray<FString>& Args);
     FExecStatus GetCameraAnnotations(const TArray<FString>& Args);
 };
