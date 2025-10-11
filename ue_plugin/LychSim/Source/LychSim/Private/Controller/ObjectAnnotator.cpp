@@ -92,7 +92,7 @@ void FObjectAnnotator::GetAnnotationColor(AActor* Actor, FColor& AnnotationColor
 		UE_LOG(LogTemp, Warning, TEXT("In actor %s, the number of MeshComponent (%d) and AnnotationComponent (%d) is different."), *Actor->GetName(), MeshComponents.Num(), AnnotationComponents.Num());
 		// for (UActorComponent* Component : MeshComponents)
 		// {
-		// 	UE_LOG(LogTemp, Warning, TEXT("%s"), *Component->GetName()); 
+		// 	UE_LOG(LogTemp, Warning, TEXT("%s"), *Component->GetName());
 		// }
 	}
 	UAnnotationComponent* AnnotationComponent = Cast<UAnnotationComponent>(AnnotationComponents[0]);
@@ -216,7 +216,7 @@ void FObjectAnnotator::AnnotateMeshComponents(UWorld* World)
 		}
 	}
 
-	for (int i = 0; i < ComponentList.Num(); i++)	
+	for (int i = 0; i < ComponentList.Num(); i++)
 	// for (UMeshComponent* MeshComponent : ComponentList)
 	{
 		UMeshComponent* MeshComponent = ComponentList[i];
@@ -364,16 +364,16 @@ void FObjectAnnotator::AnnotateGroupedActors(UWorld* World)
 
 void FObjectAnnotator::ClearAnnotations(UWorld* World)
 {
-	    if (!IsValid(World)) return;
-	    AnnotationColors.Empty();
-	    int32 Count = 0;
-	    for (TObjectIterator<UAnnotationComponent> It; It; ++It)
-		    {
-			        UAnnotationComponent* Comp = *It;
-			        if (!IsValid(Comp)) continue;
-			        if (Comp->GetWorld() != World) continue;
-			        Comp->DestroyComponent();
-			        Count++;
-			    }
-	    UE_LOG(LogUnrealCV, Log, TEXT("ClearAnnotations: removed %d comps"), Count);
+	if (!IsValid(World)) return;
+	AnnotationColors.Empty();
+	int32 Count = 0;
+	for (TObjectIterator<UAnnotationComponent> It; It; ++It)
+	{
+	    UAnnotationComponent* Comp = *It;
+	    if (!IsValid(Comp)) continue;
+	    if (Comp->GetWorld() != World) continue;
+	    Comp->DestroyComponent();
+	    Count++;
 	}
+	UE_LOG(LogUnrealCV, Log, TEXT("ClearAnnotations: removed %d comps"), Count);
+}
