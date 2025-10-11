@@ -109,3 +109,6 @@ class CameraCommandsMixin:
     def get_cam_annots(self, cam_id: int) -> dict:
         res = self.client.request(f"lych cam get_annots {cam_id}")
         return json.loads(res)
+
+    def clear_annot_comps(self) -> None:
+        self.client.request("lych cam clear_annot_comps")

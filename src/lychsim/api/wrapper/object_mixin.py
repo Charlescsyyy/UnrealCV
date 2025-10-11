@@ -72,3 +72,25 @@ class ObjectCommandsMixin:
             return json.loads(res)
         except Exception:
             raise ValueError(f"Failed to parse JSON: {res}")
+
+    def add_obj(
+        self, obj_id: str, obj_path: str, loc: list | np.ndarray, rot: list | np.ndarray
+    ) -> None:
+        if isinstance(loc, np.ndarray):
+            loc = loc.tolist()
+        if isinstance(rot, np.ndarray):
+            rot = rot.tolist()
+        loc_str = " ".join(map(str, loc))
+        rot_str = " ".join(map(str, rot))
+        self.client.request(f"lych obj add {obj_id} {obj_path} {loc_str} {rot_str}")
+
+    def del_obj(self, obj_id: str) -> None:
+        self.client.request(f"lych obj del {obj_id}")
+
+    def get_mesh_extent(self, obj_id: str | list[str]) -> dict:
+        obj_id_str = obj_id if isinstance(obj_id, str) else " ".join(obj_id)
+        res = self.client.request(f"lych obj get_mesh_extent {obj_id_str}")
+        try:
+            return json.loads(res)
+        except Exception:
+            raise ValueError(f"Failed to parse JSON: {res}")
