@@ -72,9 +72,9 @@ void FLychSimCameraHandler::RegisterCommands() {
 	);
 
 	CommandDispatcher->BindCommand(
-		"lych cam rebuild_annot",
-		FDispatcherDelegate::CreateRaw(this, &FLychSimCameraHandler::RebuildAnnotations),
-		"Rebuild the annotations for the camera"
+		"lych cam annotate_new",
+		FDispatcherDelegate::CreateRaw(this, &FLychSimCameraHandler::AnnotateNewObjects),
+		"Annotate all new objects; note that objects are automatically annotated when added with \"lych obj add\""
 	);
 
 	CommandDispatcher->BindCommand(
@@ -220,12 +220,12 @@ FExecStatus FLychSimCameraHandler::GetCameraSeg(const TArray<FString>& Args)
 	return ExecStatus;
 }
 
-FExecStatus FLychSimCameraHandler::RebuildAnnotations(const TArray<FString>& Args)
+FExecStatus FLychSimCameraHandler::AnnotateNewObjects(const TArray<FString>& Args)
 {
 	TWeakObjectPtr<AUnrealcvWorldController> WorldController = FUnrealcvServer::Get().WorldController;
 	if (WorldController.IsValid())
 	{
-		WorldController->RebuildAnnotations();
+		WorldController->AnnotateNewObjects();
 		return FExecStatus::OK();
 	}
 	else
