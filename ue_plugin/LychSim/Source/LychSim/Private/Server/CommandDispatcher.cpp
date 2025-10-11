@@ -129,7 +129,7 @@ bool FCommandDispatcher::BindCommand(const FString& ReadableUriTemplate, const F
 
 bool FCommandDispatcher::BindCommandUE(const FString& ReadableUriTemplate, const FDispatcherDelegateUE& Command, const FString& Description) // Parse URI
 {
-	FString UriTemplate = ReadableUriTemplate + TEXT(" (\\S+(?:\\s+\\S+)*)[ ]*$");
+	FString UriTemplate = ReadableUriTemplate + TEXT("(?:\\s+(\\S+(?:\\s+\\S+)*))?[ ]*$");
 
 	if (UriMappingUE.Contains(UriTemplate))
 	{
