@@ -441,6 +441,11 @@ FExecStatus FLychSimObjectHandler::GetObjectAnnotations(
 			Writer->WriteValue(Rotation.Pitch); Writer->WriteValue(Rotation.Yaw); Writer->WriteValue(Rotation.Roll);
 			Writer->WriteArrayEnd();
 
+			FVector Scale = Actor->GetActorScale3D();
+			Writer->WriteArrayStart(TEXT("scale"));
+			Writer->WriteValue(Scale.X); Writer->WriteValue(Scale.Y); Writer->WriteValue(Scale.Z);
+			Writer->WriteArrayEnd();
+
 			FColor AnnotationColor;
 			Controller.GetAnnotationColor(AnnotationColor);
 			Writer->WriteArrayStart(TEXT("color"));
