@@ -436,6 +436,11 @@ FExecStatus FLychSimObjectHandler::GetObjectAnnotations(
 			Writer->WriteValue(Location.X); Writer->WriteValue(Location.Y); Writer->WriteValue(Location.Z);
 			Writer->WriteArrayEnd();
 
+			FRotator Rotation = Controller.GetRotation();
+			Writer->WriteArrayStart(TEXT("rotation"));
+			Writer->WriteValue(Rotation.Pitch); Writer->WriteValue(Rotation.Yaw); Writer->WriteValue(Rotation.Roll);
+			Writer->WriteArrayEnd();
+
 			FColor AnnotationColor;
 			Controller.GetAnnotationColor(AnnotationColor);
 			Writer->WriteArrayStart(TEXT("color"));
