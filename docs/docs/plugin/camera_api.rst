@@ -55,8 +55,6 @@ Getting Camera Information
      :widths: 25 75
 
      * - Parameters
-       - :code:`<cam_id>`: ID of the camera.
-       - :code:`<width>`: Width of the film in pixels.
-       - :code:`<height>`: Height of the film in pixels.
+       - :code:`<cam_id>`: ID of the camera; :code:`<width>`: width of the film in pixels; :code:`<height>`: height of the film in pixels.
      * - Returns
        - :code:`ok` if successful, or an error message if failed.
