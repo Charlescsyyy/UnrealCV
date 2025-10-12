@@ -17,6 +17,7 @@
 #include "UnrealcvLog.h"
 #include "UnrealcvStats.h"
 #include "Commands/LychSimObjectHandler.h"
+#include "Commands/LychSimDataHandler.h"
 #include "Commands/LychSimUtilsHandler.h"
 #include "Commands/SegmentationHandler.h"
 #include "Commands/LychSimCameraHandler.h"
@@ -112,6 +113,7 @@ void FUnrealcvServer::RegisterCommandHandlers()
 	CommandHandlers.Add(new FAliasHandler());
 	CommandHandlers.Add(new FCameraHandler());
 	CommandHandlers.Add(new FLychSimObjectHandler());
+	CommandHandlers.Add(new FLychSimDataHandler());
 	CommandHandlers.Add(new FLychSimUtilsHandler());
 	CommandHandlers.Add(new FLychSimCameraHandler());
 	CommandHandlers.Add(new FSegmentationHandler());

@@ -78,6 +78,11 @@ FConsoleHelper::FConsoleHelper()
 		TEXT("LychSim API for camera operations"),
 		FConsoleCommandWithArgsDelegate::CreateRaw(this, &FConsoleHelper::Lych)
 	);
+	IConsoleObject* LychDataCmd = IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("lych data"),
+		TEXT("LychSim API for data collection operations"),
+		FConsoleCommandWithArgsDelegate::CreateRaw(this, &FConsoleHelper::Lych)
+	);
 }
 
 FConsoleHelper& FConsoleHelper::Get()
