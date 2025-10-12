@@ -135,7 +135,7 @@ def add_selection_as_table(state, num_objects):
 
 def add_camera_location(state):
     cam_id = state.cam_id
-    loc = state.sim.get_cam_loc(cam_id)
+    loc = state.sim.get_cam_loc(0)
 
     before_count = len(state.cam_locations)
     state.cam_locations.append(loc)
