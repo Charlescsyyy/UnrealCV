@@ -1,11 +1,11 @@
 {% if theme_navbar_start or theme_navbar_center or theme_navbar_end or theme_navbar_persistent %}
-<div class="bd-header__inner bd-page-width">
+<div class="bd-header__inner bd-page-width" style="padding: 0px;">
   <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="{{ _('Site navigation') }}">
     <span class="fa-solid fa-bars"></span>
   </button>
   {% set navbar_start, navbar_class, navbar_align = navbar_align_class() %}
   {% if theme_navbar_start %}
-  <div class="{{ navbar_start }} navbar-header-items__start">
+  <div class="{{ navbar_start }} navbar-header-items__start" style="padding-left: 2rem;">
     {% for navbar_item in theme_navbar_start %}
       <div class="navbar-item">{% include navbar_item %}</div>
     {% endfor %}

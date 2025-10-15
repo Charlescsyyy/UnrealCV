@@ -28,10 +28,10 @@
       {% set default_mode = "light" %}
     {% endif %}
     {% set js_mode = "light" if default_mode == "dark" else "dark" %}
-    <img src="{{ theme_logo['image_relative'][default_mode] }}" class="logo__image only-{{ default_mode }}" alt="{{ alt }}"/>
-    <img src="{{ theme_logo['image_relative'][js_mode] }}" class="logo__image only-{{ js_mode }} pst-js-only" alt="{{ alt }}"/>
+    <img src="{{ theme_logo['image_relative'][default_mode] }}" class="logo__image only-{{ default_mode }}" alt="{{ alt }}" style="height: 30px !important; margin-bottom: 0px;"/>
+    <img src="{{ theme_logo['image_relative'][js_mode] }}" class="logo__image only-{{ js_mode }} pst-js-only" alt="{{ alt }}" style="height: 30px !important; margin-bottom: 0px;"/>
   {% endif %}
   {% if not is_logo or theme_logo.get("text") %}
-    <p class="title logo__title">{{ theme_logo.get("text") or docstitle }}</p>
+    <p class="title logo__title" style="color: #A90B0B; font-weight: bold;">{{ theme_logo.get("text") or docstitle }}</p>
   {% endif %}
 </a>

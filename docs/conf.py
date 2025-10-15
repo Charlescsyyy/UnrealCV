@@ -37,6 +37,20 @@ html_static_path = ["_static"]
 html_css_files = ["custom.css", "mycss.css", "mybadges.css"]
 
 html_title = "LychSim"
+html_theme_options = {
+   "logo": {
+      "text": "LychSim",
+      "image_light": "_static/lychee.png",
+   },
+   "footer_start": ["copyright"],
+   "footer_end": ["theme-version.html"],
+   # "secondary_sidebar_items": [],
+   "navbar_end": [],
+}
+html_show_sourcelink = False
+html_sidebars = {
+   "**": [],
+}
 
 rst_prolog = """
 .. |area-llm| replace:: :bdg-blue-line:`LLM`
@@ -57,7 +71,6 @@ rst_prolog = """
    :class: blue-bul
 .. role:: orange
 """
-
 
 def setup(app: Sphinx) -> None:
     app.add_css_file("css/custom.css")

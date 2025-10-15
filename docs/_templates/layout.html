@@ -17,6 +17,11 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "{{ default_mode }}";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "{{ default_mode }}";
   </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+
   <!--
     this give us a css class that will be invisible only if js is disabled
   -->
@@ -83,18 +88,23 @@
   {% endblock docs_navbar %}
 
   <div class="bd-container">
-    <div class="bd-container__inner bd-page-width">
+    <div class="bd-container__inner bd-page-width container-xxl">
       {# Primary sidebar #}
       {# If we have no sidebar TOC, pop the TOC component from the sidebars list #}
       {% if suppress_sidebar_toctree(includehidden=theme_sidebar_includehidden | tobool) %}
         {% set sidebars = sidebars | reject("in", ["sidebar-collapse.html", "sidebar-nav-bs.html"]) | list %}
       {% endif %}
       <dialog id="pst-primary-sidebar-modal"></dialog>
-      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar{% if not sidebars %} hide-on-wide{% endif %}">
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar{% if not sidebars %} hide-on-wide{% endif %} col-lg-3">
         {% include "sections/sidebar-primary.html" %}
       </div>
+      <div class="col-lg-3">
+        <div class="sidebar-placeholder" style="visibility: hidden;">
+          <p>placeholder</p>
+        </div>
+      </div>
       {# Using an ID here so that the skip-link works #}
-      <main id="main-content" class="bd-main" role="main">
+      <main id="main-content" class="col-lg-9 bd-main" role="main">
         {# Main content area #}
         {% block docs_main %}
           <div class="bd-content">
@@ -124,10 +134,16 @@
             </div>
             {# Secondary sidebar #}
             {% block docs_toc %}
-              {% if not remove_sidebar_secondary %}
-                <dialog id="pst-secondary-sidebar-modal"></dialog>
-                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc">{% include "sections/sidebar-secondary.html" %}</div>
-              {% endif %}
+              <dialog id="pst-secondary-sidebar-modal"></dialog>
+              <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc">
+                {% if not remove_sidebar_secondary and secondary_sidebar_items %}
+                  {% include "sections/sidebar-secondary.html" %}
+                {% else %}
+                <div class="sidebar-placeholder" style="visibility: hidden;">
+                  <p>placeholder</p>
+                </div>
+                {% endif %}
+              </div>
             {% endblock docs_toc %}
           </div>
           <footer class="bd-footer-content">
