@@ -7,4 +7,5 @@ Tutorials
 
    installation
    data_collection
+   outdoor_scenes
    integration/index
