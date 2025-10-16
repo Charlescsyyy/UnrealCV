@@ -44,3 +44,21 @@ html[data-theme=light] {
 .bd-article {
   padding-left: 0px !important;
 }
+
+.round-img {
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 0px !important;
+}
+
+.author-name {
+  text-align: center;
+}
+
+.round-figure {
+  margin-bottom: 0px !important;
+}
+
+.sd-d-flex-column {
+  margin-bottom: 1rem;
+}

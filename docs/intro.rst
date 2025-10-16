@@ -1,5 +1,5 @@
-Introducing LychSim
-===================
+Features
+========
 
 Comprehensive 2D and 3D Annotations
 -----------------------------------

@@ -24,6 +24,7 @@ extensions = [
     "sphinx.ext.autodoc",
     "mybadges",
     "sphinx_design",
+    "mytoctree",
 ]
 
 templates_path = ["_templates"]
@@ -50,6 +51,12 @@ html_theme_options = {
 html_show_sourcelink = False
 html_sidebars = {
    "**": [],
+}
+
+html_theme_options = {
+  "external_links": [
+      {"name": "GitHub", "url": "https://github.com/wufeim/LychSim"},
+  ]
 }
 
 rst_prolog = """

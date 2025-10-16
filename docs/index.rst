@@ -1,12 +1,12 @@
 LychSim
 =======
 
-Welcome to the LychSim documentation!
-
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Contents
+   :hidden:
 
+   self
    intro
    tutorials/index
    docs/index
