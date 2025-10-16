@@ -7,3 +7,4 @@ Documentation
 
    plugin/index
    assets
+   known_issues
