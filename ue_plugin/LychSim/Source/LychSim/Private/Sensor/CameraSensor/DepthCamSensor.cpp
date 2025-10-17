@@ -23,15 +23,33 @@ void UDepthCamSensor::CaptureDepth(TArray<float>& DepthData, int& Width, int& He
 {
 	if (!bIgnoreTransparentObjects)
 	{
-		TArray<TWeakObjectPtr<UPrimitiveComponent> > ComponentList;
+		auto PrevMode = this->PrimitiveRenderMode;
+		FEngineShowFlags PrevFlags = this->ShowFlags;
+		TArray<TWeakObjectPtr<UPrimitiveComponent>> PrevShowOnly = this->ShowOnlyComponents;
+
+		TArray<TWeakObjectPtr<UPrimitiveComponent>> ComponentList;
 		UAnnotationCamSensor::GetAnnotationComponents(this->GetWorld(), ComponentList);
 		this->ShowOnlyComponents = ComponentList;
 		this->PrimitiveRenderMode = ESceneCapturePrimitiveRenderMode::PRM_UseShowOnlyList;
 		this->ShowFlags.SetMaterials(false); // This will make annotation component visible
+
+		if (CheckTextureTarget())
+		{
+			this->CaptureScene();
+			FlushRenderingCommands();
+		}
+		
+		this->ShowOnlyComponents = MoveTemp(PrevShowOnly);
+		this->PrimitiveRenderMode = PrevMode;
+		this->ShowFlags = PrevFlags;
+	}
+	else
+	{
+		if (!CheckTextureTarget()) return;
+		this->CaptureScene();
+		FlushRenderingCommands();
 	}
 
-	if (!CheckTextureTarget()) return;
-	this->CaptureScene();
 	Width = this->TextureTarget->SizeX, Height = TextureTarget->SizeY;
 	DepthData.AddZeroed(Width * Height); // or AddUninitialized(FloatColorDepthData.Num());
 	FTextureRenderTargetResource* RenderTargetResource = this->TextureTarget->GameThread_GetRenderTargetResource();
