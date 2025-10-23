@@ -77,6 +77,8 @@ rst_prolog = """
 .. role:: blue-bul
    :class: blue-bul
 .. role:: orange
+.. role:: mono
+   :class: mono
 """
 
 def setup(app: Sphinx) -> None:

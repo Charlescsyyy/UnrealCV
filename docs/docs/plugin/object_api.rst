@@ -4,39 +4,54 @@ Object API
 Basics
 ------
 
-* :code:`lych object list` List all objects in the scene.
+:mono:`lych obj list`
+"""""""""""""""""""""
 
-  .. list-table::
-     :header-rows: 0
-     :widths: 25 75
+List all objects in the scene.
 
-     * - Returns
-       - :code:`<obj_name1> <obj_name2> ...`: Names of all objects in the scene.
+**Returns:**
+
+.. list-table::
+   :header-rows: 0
+   :widths: 25 75
+
+   * - :mono:`obj_id_list` : :mono:`str`
+     - IDs of all objects in the scene.
 
 Getting Object Information
 --------------------------
 
-* :code:`lych object get_loc <obj_name>` Get 3D location of an object.
+:mono:`lych obj get_loc`
+""""""""""""""""""""""""
 
-  .. list-table::
-     :header-rows: 0
-     :widths: 25 75
+Get 3D locations of objects.
 
-     * - Parameters
-       - :code:`<obj_name>`: Name of the object.
-     * - Returns
-       - :code:`<x> <y> <z>`: 3D coordinates of the object in the scene.
+**Examples:**
 
-* :code:`lych object get_aabb <obj_name>` Get axis-aligned bounding box of an object.
+.. code-block::
 
-  .. list-table::
-     :header-rows: 0
-     :widths: 25 75
+   lych obj get_loc obj_01 obj_02
+   lych obj get_loc -all
 
-     * - Parameters
-       - :code:`<obj_name>`: Name of the object.
-     * - Returns
-       - :code:`<x> <y> <z> <ex> <ey> <ez>`: 3D location and extents of the axis-aligned bounding box of the object.
+**Parameters:**
+
+.. list-table::
+   :header-rows: 0
+   :widths: 25 75
+
+   * - :mono:`obj_id_list` : :mono:`str`
+     - IDs of all objects in the scene.
+   * - :mono:`-all` : :mono:`bool`
+     - If set, get locations of all objects in the scene.
+
+**Returns:**
+
+.. list-table::
+   :header-rows: 0
+   :widths: 25 75
+
+   * - :mono:`output_json` : :mono:`str`
+     - A JSON string containing object IDs and their corresponding 3D locations. Example: :code:`{"status": "ok", "outputs": [{"obj_id": "obj_01", "location": [x1, y1, z1]}, {"obj_id": "obj_02", "location": [x2, y2, z2]}]}`.
 
 Modifying objects
 -----------------

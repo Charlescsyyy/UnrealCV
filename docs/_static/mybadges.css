@@ -358,3 +358,8 @@ a {
 .sd-text-deeporange, .sd-text-deeporange > p {
     color: #ff5722 !important;
 }
+
+.mono {
+    font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-weight: bold;
+}
