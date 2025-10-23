@@ -11,7 +11,7 @@ class ObjectCommandsMixin:
         res = self.client.request("lych obj list")
         return res.strip().split(" ")
 
-    def get_obj_aabb(self, obj_id: str = None) -> tuple[np.ndarray, np.ndarray]:
+    def get_obj_aabb(self, obj_id: str = None):
         if obj_id is None:
             res = self.client.request("lych obj get_aabb -all")
         else:
@@ -22,6 +22,36 @@ class ObjectCommandsMixin:
         res = self.client.request(f"lych obj get_obb {obj_id}")
         res = [float(x) for x in res.strip().split(" ")]
         return np.array(res[:3]), np.array(res[3:])
+
+    def get_obj_loc(self, obj_id: str = None) -> tuple[np.ndarray, np.ndarray]:
+        if obj_id is None:
+            res = self.client.request("lych obj get_loc -all")
+        else:
+            res = self.client.request(f"lych obj get_loc {obj_id}")
+        return json.loads(res)
+
+    def get_obj_rot(self, obj_id: str = None) -> tuple[np.ndarray, np.ndarray]:
+        if obj_id is None:
+            res = self.client.request("lych obj get_rot -all")
+        else:
+            res = self.client.request(f"lych obj get_rot {obj_id}")
+        return json.loads(res)
+
+    def update_obj(self, obj_id, loc: list | np.ndarray = None, rot: list | np.ndarray = None) -> None:
+        if loc is None and rot is None:
+            raise ValueError("Either loc or rot must be provided.")
+        params = ""
+        if loc is not None:
+            if isinstance(loc, np.ndarray):
+                loc = loc.tolist()
+            loc = ",".join(map(str, loc))
+            params += f" -loc={loc}"
+        if rot is not None:
+            if isinstance(rot, np.ndarray):
+                rot = rot.tolist()
+            rot = ",".join(map(str, rot))
+            params += f" -rot={rot}"
+        self.client.request(f"lych obj update {obj_id}{params}")
 
     def get_obj_mask(
         self, cam_id: int, obj_id: str | list[str] = None
