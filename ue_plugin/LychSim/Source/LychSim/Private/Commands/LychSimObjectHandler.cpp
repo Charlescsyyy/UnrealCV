@@ -32,6 +32,30 @@ void FLychSimObjectHandler::RegisterCommands()
 	);
 
 	CommandDispatcher->BindCommandUE(
+		"lych obj get_rot",
+		FDispatcherDelegateUE::CreateRaw(this, &FLychSimObjectHandler::GetObjectRotation),
+		"Get object rotation [pitch, yaw, roll]."
+	);
+
+	CommandDispatcher->BindCommandUE(
+		"lych obj set_loc",
+		FDispatcherDelegateUE::CreateRaw(this, &FLychSimObjectHandler::SetObjectLocation),
+		"Set object location [x, y, z]."
+	);
+
+	CommandDispatcher->BindCommandUE(
+		"lych obj set_rot",
+		FDispatcherDelegateUE::CreateRaw(this, &FLychSimObjectHandler::SetObjectRotation),
+		"Set object rotation [pitch, yaw, roll]."
+	);
+
+	CommandDispatcher->BindCommandUE(
+		"lych obj update",
+		FDispatcherDelegateUE::CreateRaw(this, &FLychSimObjectHandler::UpdateObject),
+		"Update object properties."
+	);
+
+	CommandDispatcher->BindCommandUE(
 		"lych obj get_aabb",
 		FDispatcherDelegateUE::CreateRaw(this, &FLychSimObjectHandler::GetObjectAABB),
 		"Get object axis-aligned bounding box [center(3), extent(3)]."
@@ -176,7 +200,7 @@ FExecStatus FLychSimObjectHandler::GetObjectLocation(
 			FActorController Controller(Actor);
 			FVector Location = Controller.GetLocation();
 
-			Writer->WriteArrayStart(TEXT("center"));
+			Writer->WriteArrayStart(TEXT("location"));
         	Writer->WriteValue(Location.X); Writer->WriteValue(Location.Y); Writer->WriteValue(Location.Z);
         	Writer->WriteArrayEnd();
 		}
@@ -188,6 +212,250 @@ FExecStatus FLychSimObjectHandler::GetObjectLocation(
 	Writer->WriteObjectEnd();
 	Writer->Close();
 
+	return FExecStatus::OK(MoveTemp(Out));
+}
+
+FExecStatus FLychSimObjectHandler::GetObjectRotation(
+	const TArray<FString>& Pos,
+    const TMap<FString,FString>& Kw,
+    const TSet<FString>& Flags)
+{
+	TArray<AActor*> ActorList;
+	if (Flags.Contains("all"))
+	{
+		UVisionBPLib::GetActorList(ActorList);
+	}
+	else
+	{
+		for (const FString& ActorId : Pos)
+		{
+			AActor* Actor = GetActorById(FUnrealcvServer::Get().GetWorld(), ActorId);
+			ActorList.Add(Actor);
+		}
+	}
+
+	FString Out;
+    TSharedRef< TJsonWriter<> > Writer = TJsonWriterFactory<>::Create(&Out);
+
+	Writer->WriteObjectStart();
+	Writer->WriteValue(TEXT("status"), TEXT("ok"));
+
+	Writer->WriteArrayStart(TEXT("outputs"));
+
+	for (AActor* Actor : ActorList)
+	{
+		Writer->WriteObjectStart();
+		Writer->WriteValue(TEXT("object_id"), *Actor->GetName());
+
+		if (!Actor)
+        {
+            Writer->WriteValue(TEXT("status"), TEXT("not_found"));
+        }
+		else
+		{
+			Writer->WriteValue(TEXT("status"), TEXT("ok"));
+
+			FActorController Controller(Actor);
+			FVector Location = Controller.GetLocation();
+
+			FRotator Rotation = Controller.GetRotation();
+			Writer->WriteArrayStart(TEXT("rotation"));
+			Writer->WriteValue(Rotation.Pitch); Writer->WriteValue(Rotation.Yaw); Writer->WriteValue(Rotation.Roll);
+			Writer->WriteArrayEnd();
+		}
+
+		Writer->WriteObjectEnd();
+	}
+
+	Writer->WriteArrayEnd();
+	Writer->WriteObjectEnd();
+	Writer->Close();
+
+	return FExecStatus::OK(MoveTemp(Out));
+}
+
+FExecStatus FLychSimObjectHandler::SetObjectLocation(
+	const TArray<FString>& Pos,
+    const TMap<FString,FString>& Kw,
+    const TSet<FString>& Flags)
+{
+	FString Out;
+    TSharedRef< TJsonWriter<> > Writer = TJsonWriterFactory<>::Create(&Out);
+	Writer->WriteObjectStart();
+
+	FString ActorId;
+	if (Pos.Num() > 0)
+	{
+		ActorId = Pos[0];
+	}
+	else
+	{
+		Writer->WriteValue(TEXT("status"), TEXT("Object ID not specified"));
+		Writer->WriteObjectEnd();
+		Writer->Close();
+		return FExecStatus::OK(MoveTemp(Out));
+	}
+
+	AActor* Actor = GetActorById(FUnrealcvServer::Get().GetWorld(), ActorId);
+	if (!Actor)
+	{
+		Writer->WriteValue(TEXT("status"), TEXT("Object not found"));
+		Writer->WriteObjectEnd();
+		Writer->Close();
+		return FExecStatus::OK(MoveTemp(Out));
+	}
+
+	FActorController Controller(Actor);
+	float X = FCString::Atof(*Pos[1]), Y = FCString::Atof(*Pos[2]), Z = FCString::Atof(*Pos[3]);
+	FVector NewLocation = FVector(X, Y, Z);
+	Controller.SetLocation(NewLocation);
+
+	Writer->WriteValue(TEXT("status"), TEXT("ok"));
+	Writer->WriteObjectEnd();
+	Writer->Close();
+	return FExecStatus::OK(MoveTemp(Out));
+}
+
+FExecStatus FLychSimObjectHandler::SetObjectRotation(
+	const TArray<FString>& Pos,
+    const TMap<FString,FString>& Kw,
+    const TSet<FString>& Flags)
+{
+	FString Out;
+    TSharedRef< TJsonWriter<> > Writer = TJsonWriterFactory<>::Create(&Out);
+	Writer->WriteObjectStart();
+
+	FString ActorId;
+	if (Pos.Num() > 0)
+	{
+		ActorId = Pos[0];
+	}
+	else
+	{
+		Writer->WriteValue(TEXT("status"), TEXT("Object ID not specified"));
+		Writer->WriteObjectEnd();
+		Writer->Close();
+		return FExecStatus::OK(MoveTemp(Out));
+	}
+
+	AActor* Actor = GetActorById(FUnrealcvServer::Get().GetWorld(), ActorId);
+	if (!Actor)
+	{
+		Writer->WriteValue(TEXT("status"), TEXT("Object not found"));
+		Writer->WriteObjectEnd();
+		Writer->Close();
+		return FExecStatus::OK(MoveTemp(Out));
+	}
+
+	FActorController Controller(Actor);
+	float Pitch = FCString::Atof(*Pos[1]), Yaw = FCString::Atof(*Pos[2]), Roll = FCString::Atof(*Pos[3]);
+	FRotator Rotator = FRotator(Pitch, Yaw, Roll);
+	Controller.SetRotation(Rotator);
+
+	Writer->WriteValue(TEXT("status"), TEXT("ok"));
+	Writer->WriteObjectEnd();
+	Writer->Close();
+	return FExecStatus::OK(MoveTemp(Out));
+}
+
+FExecStatus FLychSimObjectHandler::UpdateObject(
+	const TArray<FString>& Pos,
+    const TMap<FString,FString>& Kw,
+    const TSet<FString>& Flags)
+{
+	FString Out;
+    TSharedRef< TJsonWriter<> > Writer = TJsonWriterFactory<>::Create(&Out);
+	Writer->WriteObjectStart();
+
+	FString ActorId;
+	if (Pos.Num() > 0)
+	{
+		ActorId = Pos[0];
+	}
+	else
+	{
+		Writer->WriteValue(TEXT("status"), TEXT("Object ID not specified"));
+		Writer->WriteObjectEnd();
+		Writer->Close();
+		return FExecStatus::OK(MoveTemp(Out));
+	}
+
+	AActor* Actor = GetActorById(FUnrealcvServer::Get().GetWorld(), ActorId);
+	if (!Actor)
+	{
+		Writer->WriteValue(TEXT("status"), TEXT("Object not found"));
+		Writer->WriteObjectEnd();
+		Writer->Close();
+		return FExecStatus::OK(MoveTemp(Out));
+	}
+
+	for (UActorComponent* Comp : Actor->GetComponents())
+	{
+		if (USceneComponent* SceneComp = Cast<USceneComponent>(Comp))
+		{
+			SceneComp->SetMobility(EComponentMobility::Movable);
+		}
+	}
+
+	FActorController Controller(Actor);
+
+	bool LocUpdated = false; bool RotUpdated = false;
+
+	if (Kw.Contains(TEXT("loc")))
+	{
+		FString LocStr = Kw[TEXT("loc")];
+
+		TArray<FString> Parts;
+		LocStr.ParseIntoArray(Parts, TEXT(","), true);
+
+		if (Parts.Num() == 3)
+		{
+			float X = FCString::Atof(*Parts[0]); float Y = FCString::Atof(*Parts[1]); float Z = FCString::Atof(*Parts[2]);
+			FVector NewLocation = FVector(X, Y, Z);
+			Controller.SetLocation(NewLocation);
+		}
+		else{
+			Writer->WriteValue(TEXT("status"), TEXT("Cannot parse loc argument"));
+			Writer->WriteObjectEnd();
+			Writer->Close();
+			return FExecStatus::OK(MoveTemp(Out));
+		}
+		LocUpdated = true;
+	}
+
+	if (Kw.Contains(TEXT("rot")))
+	{
+		FString RotStr = Kw[TEXT("rot")];
+
+		TArray<FString> Parts;
+		RotStr.ParseIntoArray(Parts, TEXT(","), true);
+
+		if (Parts.Num() == 3)
+		{
+			float Pitch = FCString::Atof(*Parts[0]); float Yaw = FCString::Atof(*Parts[1]); float Roll = FCString::Atof(*Parts[2]);
+			FRotator NewRotation = FRotator(Pitch, Yaw, Roll);
+			Controller.SetRotation(NewRotation);
+		}
+		else{
+			Writer->WriteValue(TEXT("status"), TEXT("Cannot parse rot argument"));
+			Writer->WriteObjectEnd();
+			Writer->Close();
+			return FExecStatus::OK(MoveTemp(Out));
+		}
+		RotUpdated = true;
+	}
+
+	if (!LocUpdated && !RotUpdated)
+	{
+		Writer->WriteValue(TEXT("status"), TEXT("No properties to update"));
+		Writer->WriteObjectEnd();
+		Writer->Close();
+		return FExecStatus::OK(MoveTemp(Out));
+	}
+
+	Writer->WriteValue(TEXT("status"), TEXT("ok"));
+	Writer->WriteObjectEnd();
+	Writer->Close();
 	return FExecStatus::OK(MoveTemp(Out));
 }
 

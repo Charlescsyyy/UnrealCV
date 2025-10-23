@@ -13,6 +13,10 @@ private:
 
 	FExecStatus GetObjectLocation(const TArray<FString>& Args);
 	FExecStatus GetObjectLocation(const TArray<FString>& Pos, const TMap<FString,FString>& Kw, const TSet<FString>& Flags);
+	FExecStatus GetObjectRotation(const TArray<FString>& Pos, const TMap<FString,FString>& Kw, const TSet<FString>& Flags);
+	FExecStatus SetObjectLocation(const TArray<FString>& Pos, const TMap<FString,FString>& Kw, const TSet<FString>& Flags);
+	FExecStatus SetObjectRotation(const TArray<FString>& Pos, const TMap<FString,FString>& Kw, const TSet<FString>& Flags);
+	FExecStatus UpdateObject(const TArray<FString>& Pos, const TMap<FString,FString>& Kw, const TSet<FString>& Flags);
 	FExecStatus GetObjectAABB(const TArray<FString>& Pos, const TMap<FString,FString>& Kw, const TSet<FString>& Flags);
 	FExecStatus GetObjectOBB(const TArray<FString>& Args);
 	FExecStatus GetObjectAnnotationColor(const TArray<FString>& Pos, const TMap<FString,FString>& Kw, const TSet<FString>& Flags);
