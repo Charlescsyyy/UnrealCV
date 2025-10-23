@@ -420,15 +420,23 @@ def capture_and_save(scene_state, view_name, camera_warmup_steps=10):
     normal = scene_state.sim.get_cam_normal(scene_state.cam_id)
     normal.save(os.path.join(scene_output_path, "normal.png"))
 
-    scene_state.sim.clear_annot_comps()
-
     annots_obj = scene_state.sim.get_obj_annots()
     with open(os.path.join(scene_output_path, "object_annots.json"), "w") as f:
         json.dump(annots_obj, f)
 
     annots_cam = scene_state.sim.get_cam_annots(scene_state.cam_id)
+    fov = annots_cam["outputs"]["fov"]
+    w = annots_cam["outputs"]["width"]
+    h = annots_cam["outputs"]["height"]
+    fovx = np.deg2rad(fov)
+    fx = 0.5 * w / np.tan(0.5 * fovx)
+    fovy = 2.0 * np.arctan((h / float(w)) * np.tan(0.5 * fovx))
+    fy = 0.5 * h / np.tan(0.5 * fovy)
+    annots_cam["outputs"]["fxfycxcy"] = [fx, fy, w / 2.0, h / 2.0]
     with open(os.path.join(scene_output_path, "camera_annots.json"), "w") as f:
         json.dump(annots_cam, f)
+
+    scene_state.sim.clear_annot_comps()
 
 
 def visualize_bbox(img, corners_2d, edges, color=(255, 255, 0, 255), thickness=2):
